@@ -1,464 +1,195 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام اختبارات بايثون</title>
-
-  <!-- خطوط القاهرة -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- مكتبات SurveyJS -->
-  <script src="https://unpkg.com/jquery"></script>
-  <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
-  <script src="https://unpkg.com/survey-jquery@1.9.110/survey.jquery.min.js"></script>
-  <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
-
-  <style>
-    :root {
-      --primary-color: #1e3a8a;
-      --secondary-color: #10b981;
-      --primary-light: #3b82f6;
-      --primary-dark: #1e40af;
-      --secondary-light: #34d399;
-      --secondary-dark: #059669;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --background: #f9fafb;
-      --white: #ffffff;
-      --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      font-family: 'Cairo', sans-serif;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: var(--background);
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      color: var(--text-primary);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--white);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px var(--shadow);
-      overflow: hidden;
-      border-top: 5px solid var(--primary-color);
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    .header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      padding: 30px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 800;
-      position: relative;
-      z-index: 1;
-    }
-
-    .header p {
-      margin: 8px 0 0;
-      opacity: 0.9;
-      font-size: 16px;
-      font-weight: 500;
-      position: relative;
-      z-index: 1;
-    }
-
-    .exam-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary-color);
-      text-align: center;
-      padding: 20px;
-      border-bottom: 2px solid #e5e7eb;
-      background: #f8fafc;
-      display: none;
-    }
-
-    .timer-display {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary-color);
-      text-align: center;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-      border-radius: 12px;
-      margin: 20px;
-      box-shadow: 0 4px 15px rgba(30, 58, 138, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .timer-display.warning {
-      color: #f59e0b;
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
-    }
-
-    .timer-display.danger {
-      color: #ef4444;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(254, 119, 119, 0.1) 100%);
-      animation: pulse 1s infinite;
-    }
-
-    #surveyContainer {
-      padding: 20px;
-      display: none;
-    }
-
-    .submit-btn {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      padding: 18px 32px;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      margin: 20px 0;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3);
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
-    }
-
-    .error-message {
-      color: #ef4444;
-      text-align: center;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(254, 119, 119, 0.1) 100%);
-      border-radius: 12px;
-      margin: 20px;
-      font-weight: 700;
-      display: none;
-      border-right: 5px solid #ef4444;
-      animation: shake 0.5s ease-in-out;
-    }
-
-    .success-message {
-      color: var(--secondary-color);
-      text-align: center;
-      padding: 30px;
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
-      border-radius: 16px;
-      margin: 20px;
-      font-size: 22px;
-      display: none;
-      border-right: 5px solid var(--secondary-color);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .loading-spinner {
-      width: 60px;
-      height: 60px;
-      border: 6px solid rgba(30, 58, 138, 0.2);
-      border-top: 6px solid var(--primary-color);
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      animation: spin 1s linear infinite;
-    }
-
-    .loading h2 {
-      color: var(--primary-color);
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .loading p {
-      color: var(--text-secondary);
-      font-size: 16px;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      color: var(--text-secondary);
-      font-size: 14px;
-      border-top: 1px solid #e5e7eb;
-      font-weight: 500;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-      70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-      20%, 40%, 60%, 80% { transform: translateX(5px); }
-    }
-
-    @media (max-width: 768px) {
-      .header h1 { font-size: 24px; }
-      .header p { font-size: 14px; }
-      .timer-display { font-size: 24px; padding: 15px; margin: 15px; }
-      .submit-btn { padding: 16px 24px; font-size: 16px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام اختبارات بايثون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/jquery"></script>
+    <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
+    <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.110/survey.jquery.min.js"></script>
+    <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #10b981;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e40af;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --background: #f9fafb;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
+        body { background: var(--background); margin: 0; padding: 20px; min-height: 100vh; color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px var(--shadow); overflow: hidden; border-top: 5px solid var(--primary-color); }
+        .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: var(--white); padding: 30px; text-align: center; }
+        .exam-title { font-size: 22px; font-weight: 700; color: var(--primary-color); text-align: center; padding: 20px; border-bottom: 2px solid #e5e7eb; background: #f8fafc; display: none; }
+        .timer-display { font-size: 28px; font-weight: 700; color: var(--primary-color); text-align: center; padding: 20px; background: rgba(30, 58, 138, 0.05); border-radius: 12px; margin: 20px; }
+        .timer-display.danger { color: #ef4444; animation: pulse 1s infinite; }
+        #surveyContainer { padding: 20px; display: none; }
+        .error-message { color: #ef4444; text-align: center; padding: 20px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; margin: 20px; font-weight: 700; display: none; border-right: 5px solid #ef4444; }
+        .success-message { color: var(--secondary-color); text-align: center; padding: 30px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; margin: 20px; font-size: 22px; display: none; }
+        .loading { text-align: center; padding: 60px 20px; }
+        .loading-spinner { width: 50px; height: 50px; border: 5px solid rgba(30, 58, 138, 0.1); border-top: 5px solid var(--primary-color); border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🎓 نظام اختبارات بايثون</h1>
-      <p>نظام متطور للامتحانات</p>
-    </div>
-
-    <div id="examTitle" class="exam-title"></div>
-    <div class="timer-display" id="timerDisplay">⏱️ جاري التحميل...</div>
-    <div class="error-message" id="errorMessage"></div>
-
-    <div class="loading" id="loading">
-      <div class="loading-spinner"></div>
-      <h2>جاري تحميل الأسئلة...</h2>
-      <p>الرجاء الانتظار لحظات</p>
-    </div>
-
-    <div id="surveyContainer"></div>
-    <div class="success-message" id="successMessage"></div>
-
-    <div class="footer">
-      <p>© 2026 | جميع الحقوق محفوظة</p>
-    </div>
-  </div>
-
-  <script>
-    let examId = '';
-    let examToken = '';
-    let examTitle = '';
-    let timeLimit = 0;
-    let startTime = null;
-    let timerInterval = null;
-    let survey = null;
-    const WEBHOOK_URL = 'https://n8n.srv1332143.hstgr.cloud/webhook';
-
-    $(document).ready(async function() {
-      await loadSurveyData();
-    });
-
-    async function loadSurveyData() {
-      const urlParams = new URLSearchParams(window.location.search);
-      examId = urlParams.get('exam');
-      examToken = urlParams.get('token');
-
-      if (!examId || !examToken) {
-        showError('❌ رابط الاختبار غير صالح. تأكد من إدخال الرابط كاملاً.');
-        return;
-      }
-
-      try {
-        // استخدام api.allorigins.win لحل مشكلة CORS
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${WEBHOOK_URL}/get-survey?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(examToken)}`)}`;
+    <div class="container">
+        <div class="header">
+            <h1>🎓 نظام اختبارات بايثون</h1>
+            <p>يرجى الإجابة على جميع الأسئلة بدقة</p>
+        </div>
+        <div id="examTitle" class="exam-title"></div>
+        <div class="timer-display" id="timerDisplay">⏱️ جاري التحميل...</div>
+        <div class="error-message" id="errorMessage"></div>
         
-        const response = await fetch(proxyUrl, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' }
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <h2>جاري جلب بيانات الاختبار...</h2>
+        </div>
+
+        <div id="surveyContainer"></div>
+        <div class="success-message" id="successMessage"></div>
+    </div>
+
+    <script>
+        let examId = '';
+        let examToken = '';
+        let timeLimit = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let survey = null;
+
+        // الرابط الأساسي لـ n8n
+        const BASE_URL = 'https://n8n.srv1332143.hstgr.cloud/webhook';
+
+        $(document).ready(async function() {
+            await loadSurveyData();
         });
 
-        if (!response.ok) throw new Error(`الخادم أرجع حالة ${response.status}`);
+        async function loadSurveyData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            // دعم اسم المتغير 'exam' أو 'exam_id' لمرونة أكثر
+            examId = urlParams.get('exam') || urlParams.get('exam_id');
+            examToken = urlParams.get('token');
 
-        const text = await response.text();
-        if (!text.trim()) throw new Error('الاستجابة فارغة من الخادم.');
+            if (!examId || !examToken) {
+                showError('❌ خطأ: معرف الامتحان أو الرمز (Token) مفقود في الرابط.');
+                return;
+            }
 
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          console.error('Invalid JSON:', text.substring(0, 200));
-          throw new Error('بيانات غير صالحة من الخادم.');
+            try {
+                // الاتصال المباشر بـ n8n (يتطلب تفعيل CORS في n8n)
+                const response = await fetch(`${BASE_URL}/get-survey?exam=${examId}&token=${examToken}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error(`الخادم استجاب بخطأ: ${response.status}`);
+
+                const data = await response.json();
+
+                if (data.success === false) {
+                    showError(data.message || 'فشل في تحميل الاختبار.');
+                    return;
+                }
+
+                // إعداد واجهة الاختبار
+                document.getElementById('examTitle').textContent = data.title || 'اختبار جديد';
+                document.getElementById('examTitle').style.display = 'block';
+                
+                timeLimit = (data.duration_min || 15) * 60;
+                startTime = Date.now();
+                
+                startTimer();
+                initializeSurvey(data);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('surveyContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                showError('❌ فشل الاتصال بمركز الاختبارات. تأكد من أن الـ Workflow مفعّل في n8n.');
+            }
         }
 
-        if (data.error) {
-          showError(data.error);
-          return;
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = timeLimit - elapsed;
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    if (survey) survey.completeLastPage();
+                } else {
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    const display = document.getElementById('timerDisplay');
+                    display.textContent = `⏱️ الوقت المتبقي: ${mins}:${secs.toString().padStart(2, '0')}`;
+                    if (remaining < 60) display.classList.add('danger');
+                }
+            }, 1000);
         }
 
-        examTitle = data.title || 'اختبار بايثون';
-        timeLimit = (data.duration_min || 15) * 60;
-        startTime = Date.now();
+        function initializeSurvey(surveyJSON) {
+            Survey.surveyLocalization.currentLocale = "ar";
+            survey = new Survey.Model(surveyJSON);
+            
+            survey.onComplete.add((sender) => {
+                submitSurvey(sender.data);
+            });
 
-        document.getElementById('examTitle').textContent = examTitle;
-        document.getElementById('examTitle').style.display = 'block';
-
-        startTimer();
-        initializeSurvey(data);
-
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('surveyContainer').style.display = 'block';
-
-      } catch (error) {
-        console.error('Error loading survey:', error);
-        showError(`❌ ${error.message || 'فشل تحميل الأسئلة. حاول مرة أخرى.'}`);
-      }
-    }
-
-    function startTimer() {
-      updateTimerDisplay();
-
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const remaining = timeLimit - elapsed;
-
-        if (remaining <= 0) {
-          clearInterval(timerInterval);
-          if (survey) {
-            survey.completeLastPage();
-            setTimeout(() => submitSurvey(survey.data), 500);
-          }
-        } else {
-          updateTimerDisplay(remaining);
+            $("#surveyContainer").Survey({ model: survey });
         }
-      }, 1000);
-    }
 
-    function updateTimerDisplay(remaining = timeLimit) {
-      const minutes = Math.floor(remaining / 60);
-      const seconds = remaining % 60;
-      const timerElement = document.getElementById('timerDisplay');
+        async function submitSurvey(answers) {
+            document.getElementById('surveyContainer').style.display = 'none';
+            document.getElementById('loading').innerHTML = '<div class="loading-spinner"></div><h2>جاري تصحيح إجاباتك...</h2>';
+            document.getElementById('loading').style.display = 'block';
 
-      timerElement.textContent = `⏱️ الوقت المتبقي: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            try {
+                const response = await fetch(`${BASE_URL}/submit-exam`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        exam: examId,
+                        token: examToken,
+                        answers: answers,
+                        finishedAt: new Date().toISOString()
+                    })
+                });
 
-      timerElement.classList.remove('warning', 'danger');
-
-      if (remaining <= 120) timerElement.classList.add('warning');
-      if (remaining <= 30) timerElement.classList.add('danger');
-    }
-
-    function initializeSurvey(surveyJSON) {
-      Survey.StylesManager.applyTheme("defaultV2");
-      Survey.surveyLocalization.currentLocale = "ar";
-
-      surveyJSON.showProgressBar = "top";
-      surveyJSON.progressBarType = "questions";
-      surveyJSON.goNextPageAutomatic = false;
-      surveyJSON.showNavigationButtons = "bottom";
-      surveyJSON.showPrevButton = true;
-      surveyJSON.pageNextText = "التالي";
-      surveyJSON.pagePrevText = "السابق";
-      surveyJSON.completeText = "إنهاء الاختبار";
-
-      surveyJSON.completedHtml = `
-        <div style="text-align:center; padding:40px;">
-          <h2 style="color:#10b981; font-size:32px; margin-bottom:20px;">🎉 تم إكمال الاختبار بنجاح!</h2>
-          <p style="font-size:20px; margin:20px 0; color:#1f2937;">سيتم إرسال نتيجتك خلال لحظات.</p>
-          <div style="font-size:28px; color:#1e3a8a; margin-top:30px; animation:pulse 2s infinite;">⏳ جاري معالجة إجاباتك...</div>
-        </div>
-      `;
-
-      survey = new Survey.Model(surveyJSON);
-
-      survey.onComplete.add((sender) => {
-        submitSurvey(sender.data);
-      });
-
-      $("#surveyContainer").Survey({ model: survey });
-    }
-
-    async function submitSurvey(answers) {
-      const submitBtn = document.querySelector('.submit-btn');
-      if (submitBtn) submitBtn.disabled = true;
-
-      const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-
-      try {
-        const response = await fetch(`${WEBHOOK_URL}/submit-exam`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            exam: examId,
-            token: examToken,
-            answers: answers,
-            timeSpent: timeSpent,
-            finishedAt: new Date().toISOString()
-          })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showSuccess(result);
-        } else {
-          showError(result.message || 'فشل في إرسال الإجابات');
+                const result = await response.json();
+                showSuccess(result);
+            } catch (error) {
+                showError('❌ حدث خطأ أثناء إرسال الإجابات، لكن تم حفظها محلياً.');
+            } finally {
+                if (timerInterval) clearInterval(timerInterval);
+            }
         }
-      } catch (error) {
-        console.error('Submit error:', error);
-        showError(`❌ خطأ في الإرسال: ${error.message}`);
-      } finally {
-        if (submitBtn) submitBtn.disabled = false;
-        if (timerInterval) clearInterval(timerInterval);
-      }
-    }
 
-    function showError(message) {
-      const el = document.getElementById('errorMessage');
-      el.textContent = message;
-      el.style.display = 'block';
-      document.getElementById('loading').style.display = 'none';
-      setTimeout(() => { el.style.display = 'none'; }, 10000);
-    }
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
 
-    function showSuccess(result) {
-      document.getElementById('surveyContainer').style.display = 'none';
-      const msg = document.getElementById('successMessage');
-      msg.innerHTML = `
-        <h2>✅ تم إرسال إجاباتك بنجاح!</h2>
-        <p style="font-size:28px; margin:20px 0; color:#1e3a8a;">
-          نتيجتك: <strong>${result.score || 0}/${result.max || 0}</strong>
-        </p>
-        <p style="font-size:20px; color:#6b7280; margin:15px 0;">
-          ${result.message || 'سيتم إرسال التفاصيل عبر تليجرام.'}
-        </p>
-        <div style="margin-top:25px; font-size:18px; color:#10b981;">
-          📱 تحقق من رسائلك في تليجرام
-        </div>
-      `;
-      msg.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    window.addEventListener('beforeunload', function() {
-      if (timerInterval) clearInterval(timerInterval);
-    });
-  </script>
+        function showSuccess(result) {
+            document.getElementById('loading').style.display = 'none';
+            const msg = document.getElementById('successMessage');
+            msg.innerHTML = `
+                <h2>✅ تم الإرسال بنجاح!</h2>
+                <p style="font-size:24px; color:#1e3a8a;">درجتك: ${result.score || 0} من ${result.max || 0}</p>
+                <p>${result.message || 'تحقق من تليجرام لمزيد من التفاصيل.'}</p>
+            `;
+            msg.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
