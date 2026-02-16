@@ -1,195 +1,389 @@
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
+
+# إنشاء ملف index.html الرئيسي
+html_content = '''<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام اختبارات بايثون</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/jquery"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
-    <script src="https://unpkg.com/survey-jquery@1.9.110/survey.jquery.min.js"></script>
-    <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
+    <meta name="description" content="نظام اختبارات بايثون الاحترافي">
+    <title>نظام اختبارات بايثون | Python Quiz System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SurveyJS -->
+    <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
+    <script src="https://unpkg.com/survey-js-ui/survey-js-ui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-core/defaultV2.min.css" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
-        :root {
-            --primary-color: #1e3a8a;
-            --secondary-color: #10b981;
-            --primary-light: #3b82f6;
-            --primary-dark: #1e40af;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --background: #f9fafb;
-            --white: #ffffff;
-            --shadow: rgba(0, 0, 0, 0.1);
+        * {
+            font-family: 'Cairo', sans-serif;
         }
-        * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
-        body { background: var(--background); margin: 0; padding: 20px; min-height: 100vh; color: var(--text-primary); }
-        .container { max-width: 900px; margin: 0 auto; background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px var(--shadow); overflow: hidden; border-top: 5px solid var(--primary-color); }
-        .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: var(--white); padding: 30px; text-align: center; }
-        .exam-title { font-size: 22px; font-weight: 700; color: var(--primary-color); text-align: center; padding: 20px; border-bottom: 2px solid #e5e7eb; background: #f8fafc; display: none; }
-        .timer-display { font-size: 28px; font-weight: 700; color: var(--primary-color); text-align: center; padding: 20px; background: rgba(30, 58, 138, 0.05); border-radius: 12px; margin: 20px; }
-        .timer-display.danger { color: #ef4444; animation: pulse 1s infinite; }
-        #surveyContainer { padding: 20px; display: none; }
-        .error-message { color: #ef4444; text-align: center; padding: 20px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; margin: 20px; font-weight: 700; display: none; border-right: 5px solid #ef4444; }
-        .success-message { color: var(--secondary-color); text-align: center; padding: 30px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; margin: 20px; font-size: 22px; display: none; }
-        .loading { text-align: center; padding: 60px 20px; }
-        .loading-spinner { width: 50px; height: 50px; border: 5px solid rgba(30, 58, 138, 0.1); border-top: 5px solid var(--primary-color); border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .timer-warning {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom SurveyJS Styling */
+        .sd-root-modern {
+            --primary: #667eea;
+            --primary-light: #764ba2;
+            --background: #ffffff;
+            --question-background: #f8fafc;
+        }
+        
+        .sd-title {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 700 !important;
+        }
+        
+        .sd-question__title {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        
+        .sd-btn {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+            padding: 12px 32px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .sd-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .sd-navigation__complete-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+        
+        .progress-bar-custom {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-circle {
+            background: conic-gradient(#667eea var(--score-degree), #e2e8f0 0deg);
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎓 نظام اختبارات بايثون</h1>
-            <p>يرجى الإجابة على جميع الأسئلة بدقة</p>
+<body class="antialiased">
+    <!-- Header -->
+    <header class="glass-effect fixed top-0 left-0 right-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-code text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">Python Quiz</h1>
+                    <p class="text-xs text-gray-500">نظام الاختبارات الذكي</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="timer-display" class="hidden bg-gray-100 px-4 py-2 rounded-lg font-mono font-bold text-lg text-gray-700">
+                    <i class="fas fa-clock mr-2 text-blue-500"></i>
+                    <span id="timer-value">00:00</span>
+                </div>
+                <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-gray-100 transition">
+                    <i class="fas fa-moon text-gray-600"></i>
+                </button>
+            </div>
         </div>
-        <div id="examTitle" class="exam-title"></div>
-        <div class="timer-display" id="timerDisplay">⏱️ جاري التحميل...</div>
-        <div class="error-message" id="errorMessage"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-24 pb-12 min-h-screen">
         
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <h2>جاري جلب بيانات الاختبار...</h2>
+        <!-- Loading State -->
+        <div id="loading-state" class="flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-white text-lg font-medium">جاري تحميل الاختبار...</p>
+            <p class="text-white/70 text-sm mt-2">يرجى الانتظار</p>
         </div>
 
-        <div id="surveyContainer"></div>
-        <div class="success-message" id="successMessage"></div>
-    </div>
+        <!-- Error State -->
+        <div id="error-state" class="hidden flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="glass-effect rounded-2xl p-8 text-center max-w-md w-full">
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">عذراً!</h2>
+                <p id="error-message" class="text-gray-600 mb-6">حدث خطأ في تحميل الاختبار</p>
+                <button onclick="location.reload()" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition">
+                    <i class="fas fa-redo mr-2"></i>
+                    إعادة المحاولة
+                </button>
+            </div>
+        </div>
 
-    <script>
-        let examId = '';
-        let examToken = '';
-        let timeLimit = 0;
-        let startTime = null;
-        let timerInterval = null;
-        let survey = null;
+        <!-- Login/Start Form -->
+        <div id="start-form" class="hidden fade-in">
+            <div class="max-w-2xl mx-auto">
+                <div class="glass-effect rounded-3xl p-8 shadow-2xl">
+                    <div class="text-center mb-8">
+                        <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                            <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">مرحباً بك!</h2>
+                        <p class="text-gray-600">أدخل بياناتك للبدء في الاختبار</p>
+                    </div>
 
-        // الرابط الأساسي لـ n8n
-        const BASE_URL = 'https://n8n.srv1332143.hstgr.cloud/webhook';
+                    <form id="student-form" class="space-y-6">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-user mr-2 text-blue-500"></i>
+                                الاسم الكامل
+                            </label>
+                            <input type="text" id="student-name" required
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition text-right"
+                                placeholder="أدخل اسمك الثلاثي">
+                        </div>
 
-        $(document).ready(async function() {
-            await loadSurveyData();
-        });
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-envelope mr-2 text-blue-500"></i>
+                                البريد الإلكتروني
+                            </label>
+                            <input type="email" id="student-email" required
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition text-left"
+                                placeholder="example@email.com">
+                        </div>
 
-        async function loadSurveyData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            // دعم اسم المتغير 'exam' أو 'exam_id' لمرونة أكثر
-            examId = urlParams.get('exam') || urlParams.get('exam_id');
-            examToken = urlParams.get('token');
+                        <div id="exam-info" class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                            <h3 class="font-bold text-blue-800 mb-2">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                معلومات الاختبار
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-600">العنوان:</span>
+                                    <span id="exam-title" class="font-semibold text-gray-800 mr-1">--</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">المدة:</span>
+                                    <span id="exam-duration" class="font-semibold text-gray-800 mr-1">--</span>
+                                </div>
+                            </div>
+                        </div>
 
-            if (!examId || !examToken) {
-                showError('❌ خطأ: معرف الامتحان أو الرمز (Token) مفقود في الرابط.');
-                return;
-            }
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <input type="checkbox" id="agree-terms" required class="w-4 h-4 rounded border-gray-300">
+                            <label for="agree-terms">
+                                أوافق على <a href="#" class="text-blue-600 hover:underline">شروط الاستخدام</a> و
+                                <a href="#" class="text-blue-600 hover:underline">سياسة الخصوصية</a>
+                            </label>
+                        </div>
 
-            try {
-                // الاتصال المباشر بـ n8n (يتطلب تفعيل CORS في n8n)
-                const response = await fetch(`${BASE_URL}/get-survey?exam=${examId}&token=${examToken}`, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
+                        <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:-translate-y-1">
+                            <i class="fas fa-play mr-2"></i>
+                            بدء الاختبار
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-                if (!response.ok) throw new Error(`الخادم استجاب بخطأ: ${response.status}`);
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <!-- Progress Bar -->
+                <div class="glass-effect rounded-2xl p-4 mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-gray-600">تقدم الاختبار</span>
+                        <span id="progress-text" class="text-sm font-bold text-blue-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progress-bar" class="progress-bar-custom h-3 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
 
-                const data = await response.json();
+                <!-- Survey Container -->
+                <div class="glass-effect rounded-3xl p-6 shadow-2xl">
+                    <div id="surveyElement"></div>
+                </div>
+            </div>
+        </div>
 
-                if (data.success === false) {
-                    showError(data.message || 'فشل في تحميل الاختبار.');
-                    return;
-                }
+        <!-- Results Container -->
+        <div id="results-container" class="hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-effect rounded-3xl p-8 shadow-2xl">
+                    <!-- Result Header -->
+                    <div class="text-center mb-8">
+                        <div id="result-icon" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-5xl">
+                            🎉
+                        </div>
+                        <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2">تهانينا!</h2>
+                        <p id="result-message" class="text-gray-600">لقد أكملت الاختبار بنجاح</p>
+                    </div>
 
-                // إعداد واجهة الاختبار
-                document.getElementById('examTitle').textContent = data.title || 'اختبار جديد';
-                document.getElementById('examTitle').style.display = 'block';
-                
-                timeLimit = (data.duration_min || 15) * 60;
-                startTime = Date.now();
-                
-                startTimer();
-                initializeSurvey(data);
+                    <!-- Score Circle -->
+                    <div class="flex justify-center mb-8">
+                        <div class="score-circle" id="score-circle" style="--score-degree: 0deg;">
+                            <span class="score-text" id="score-percentage">0%</span>
+                        </div>
+                    </div>
 
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('surveyContainer').style.display = 'block';
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="result-card rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-bold text-blue-600" id="stat-score">0</div>
+                            <div class="text-sm text-gray-600">الدرجة</div>
+                        </div>
+                        <div class="result-card rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-bold text-purple-600" id="stat-max">0</div>
+                            <div class="text-sm text-gray-600">الدرجة القصوى</div>
+                        </div>
+                        <div class="result-card rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-bold text-green-600" id="stat-correct">0</div>
+                            <div class="text-sm text-gray-600">إجابات صحيحة</div>
+                        </div>
+                        <div class="result-card rounded-2xl p-4 text-center">
+                            <div class="text-3xl font-bold text-orange-600" id="stat-time">0</div>
+                            <div class="text-sm text-gray-600">الوقت (دقيقة)</div>
+                        </div>
+                    </div>
 
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                showError('❌ فشل الاتصال بمركز الاختبارات. تأكد من أن الـ Workflow مفعّل في n8n.');
-            }
-        }
+                    <!-- Detailed Results -->
+                    <div id="detailed-results" class="mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-list-check mr-2 text-blue-500"></i>
+                            تفاصيل الإجابات
+                        </h3>
+                        <div id="answers-list" class="space-y-3">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
 
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = timeLimit - elapsed;
+                    <!-- Actions -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button onclick="location.reload()" 
+                            class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            اختبار جديد
+                        </button>
+                        <button onclick="window.print()" 
+                            class="bg-gray-100 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
+                            <i class="fas fa-print mr-2"></i>
+                            طباعة النتيجة
+                        </button>
+                        <button onclick="downloadCertificate()" 
+                            class="bg-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 transition">
+                            <i class="fas fa-certificate mr-2"></i>
+                            تحميل الشهادة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-                if (remaining <= 0) {
-                    clearInterval(timerInterval);
-                    if (survey) survey.completeLastPage();
-                } else {
-                    const mins = Math.floor(remaining / 60);
-                    const secs = remaining % 60;
-                    const display = document.getElementById('timerDisplay');
-                    display.textContent = `⏱️ الوقت المتبقي: ${mins}:${secs.toString().padStart(2, '0')}`;
-                    if (remaining < 60) display.classList.add('danger');
-                }
-            }, 1000);
-        }
+    <!-- Footer -->
+    <footer class="bg-white/10 backdrop-blur-md text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">© 2024 Ahlem. جميع الحقوق محفوظة</p>
+            <p class="text-sm opacity-70">تم التطوير باستخدام <i class="fas fa-heart text-red-400"></i> و SurveyJS</p>
+        </div>
+    </footer>
 
-        function initializeSurvey(surveyJSON) {
-            Survey.surveyLocalization.currentLocale = "ar";
-            survey = new Survey.Model(surveyJSON);
-            
-            survey.onComplete.add((sender) => {
-                submitSurvey(sender.data);
-            });
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-4 left-4 z-50 space-y-2"></div>
 
-            $("#surveyContainer").Survey({ model: survey });
-        }
-
-        async function submitSurvey(answers) {
-            document.getElementById('surveyContainer').style.display = 'none';
-            document.getElementById('loading').innerHTML = '<div class="loading-spinner"></div><h2>جاري تصحيح إجاباتك...</h2>';
-            document.getElementById('loading').style.display = 'block';
-
-            try {
-                const response = await fetch(`${BASE_URL}/submit-exam`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        exam: examId,
-                        token: examToken,
-                        answers: answers,
-                        finishedAt: new Date().toISOString()
-                    })
-                });
-
-                const result = await response.json();
-                showSuccess(result);
-            } catch (error) {
-                showError('❌ حدث خطأ أثناء إرسال الإجابات، لكن تم حفظها محلياً.');
-            } finally {
-                if (timerInterval) clearInterval(timerInterval);
-            }
-        }
-
-        function showError(message) {
-            const el = document.getElementById('errorMessage');
-            el.textContent = message;
-            el.style.display = 'block';
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        function showSuccess(result) {
-            document.getElementById('loading').style.display = 'none';
-            const msg = document.getElementById('successMessage');
-            msg.innerHTML = `
-                <h2>✅ تم الإرسال بنجاح!</h2>
-                <p style="font-size:24px; color:#1e3a8a;">درجتك: ${result.score || 0} من ${result.max || 0}</p>
-                <p>${result.message || 'تحقق من تليجرام لمزيد من التفاصيل.'}</p>
-            `;
-            msg.style.display = 'block';
-        }
-    </script>
+    <script src="js/quiz.js"></script>
 </body>
-</html>
+</html>'''
+
+with open(f'{project_dir}/index.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("✅ تم إنشاء: index.html")
