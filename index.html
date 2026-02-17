@@ -395,16 +395,19 @@
             }
         }
 
-        // New function to show start form
         function showStartForm(data) {
-            DOM.loadingState.classList.add('hidden');
-            DOM.startFormState.classList.remove('hidden');
-            
-            DOM.startExamTitle.textContent = data.title || 'اختبار';
-            DOM.startExamDesc.textContent = `المدة: ${data.durationMin || data.duration_min || 15} دقيقة | ${data.pages?.[0]?.elements?.length || 0} أسئلة`;
-            
-            DOM.studentInfoForm.addEventListener('submit', handleStartExam);
-        }
+    DOM.loadingState.classList.add('hidden');
+    DOM.startFormState.classList.remove('hidden');
+    
+    // تأكد من الوصول للأسئلة بشكل صحيح
+    const questions = data.pages?.[0]?.elements || [];
+    
+    DOM.startExamTitle.textContent = data.title || 'اختبار';
+    // هنا قمنا بالتأكد من عدد الأسئلة
+    DOM.startExamDesc.textContent = `المدة: ${data.durationMin || 15} دقيقة | ${questions.length} أسئلة`;
+    
+    DOM.studentInfoForm.addEventListener('submit', handleStartExam);
+}
 
         // Handle form submission
         function handleStartExam(e) {
