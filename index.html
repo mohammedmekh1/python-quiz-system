@@ -13,25 +13,24 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* نفس التنسيقات السابقة */
         :root {
-            --bg-primary: #f5f7fa;
+            --bg-primary: #ffffff; /* أبيض صافي */
             --bg-secondary: #ffffff;
-            --bg-tertiary: #e8ecf1;
+            --bg-tertiary: #f8fafc;
             --text-primary: #1a2332;
             --text-secondary: #4a5568;
             --text-muted: #718096;
             --accent: #2563eb;
             --accent-hover: #1d4ed8;
-            --accent-light: rgba(37, 99, 235, 0.08);
-            --border: #d1d9e6;
-            --shadow: rgba(26, 35, 50, 0.08);
+            --accent-light: rgba(37, 99, 235, 0.05);
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.05);
             --success: #059669;
             --danger: #dc2626;
         }
@@ -47,252 +46,124 @@
             --accent-light: rgba(59, 130, 246, 0.12);
             --border: #30363d;
             --shadow: rgba(0, 0, 0, 0.4);
-            --success: #3fb950;
-            --danger: #f85149;
         }
         * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
-        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
-        .bg-pattern { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.3; }
-        .dark .bg-pattern { opacity: 0.1; }
-        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px var(--shadow); }
-        .spinner { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .timer-ring { transform: rotate(-90deg); }
-        .timer-ring-bg { stroke: var(--border); }
-        .timer-ring-progress { stroke: var(--accent); transition: stroke-dashoffset 1s linear; }
-        .timer-warning .timer-ring-progress { stroke: var(--danger); }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; transition: all 0.3s ease; }
         
-        /* Form Inputs */
+        /* إزالة نمط القماش - الآن خلفية سادة */
+        .bg-clean { position: fixed; inset: 0; z-index: 0; background: var(--bg-primary); }
+
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 12px var(--shadow); position: relative; z-index: 10; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .timer-ring { transform: rotate(-90deg); }
+        .timer-ring-progress { transition: stroke-dashoffset 1s linear; }
+        
         .input-field {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: 'Cairo', sans-serif;
-            font-size: 1rem;
+            width: 100%; padding: 12px 16px; background: var(--bg-tertiary);
+            border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);
             transition: all 0.2s ease;
         }
-        .input-field:focus { outline: none; border-color: var(--accent); background: var(--bg-secondary); }
-        .input-field::placeholder { color: var(--text-muted); }
+        .input-field:focus { outline: none; border-color: var(--accent); ring: 2px var(--accent-light); }
         
-        /* Buttons */
         .btn-primary {
-            background: var(--accent);
-            color: white;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background: var(--accent); color: white; font-weight: 600;
+            padding: 12px 24px; border-radius: 10px; transition: all 0.2s ease;
         }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-        
-        .theme-toggle {
-            width: 40px; height: 40px; border-radius: 10px; background: var(--bg-tertiary); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
-        }
-        .theme-toggle:hover { background: var(--accent-light); border-color: var(--accent); }
-        .theme-toggle i { color: var(--text-secondary); font-size: 1rem; }
-        
-        /* SurveyJS Overrides */
-        .sd-root-modern { --primary: var(--accent) !important; --primary-light: var(--accent-light) !important; --background: var(--bg-secondary) !important; --background-dim: var(--bg-tertiary) !important; --foreground: var(--text-primary) !important; --foreground-light: var(--text-secondary) !important; --border: var(--border) !important; --corner-radius: 10px !important; }
-        .sd-root-modern .sd-item { background: var(--bg-tertiary) !important; border: 2px solid var(--border) !important; border-radius: 10px !important; padding: 12px 16px !important; margin-bottom: 8px !important; transition: all 0.2s ease !important; }
-        .sd-root-modern .sd-item:hover { border-color: var(--accent) !important; }
-        .sd-root-modern .sd-item--checked { border-color: var(--accent) !important; background: var(--accent-light) !important; }
-        .sd-root-modern .sd-item__control-label { color: var(--text-primary) !important; font-family: 'Cairo', sans-serif !important; }
-        .sd-root-modern .sd-btn { background: var(--accent) !important; color: white !important; font-family: 'Cairo', sans-serif !important; font-weight: 600 !important; border-radius: 10px !important; padding: 10px 24px !important; border: none !important; }
-        .sd-root-modern .sd-btn:hover { background: var(--accent-hover) !important; }
-        .sd-root-modern .sd-navigation__complete-btn { background: var(--success) !important; }
-        .sd-root-modern .sd-body, .sd-root-modern .sd-page, .sd-root-modern .sd-panel { background: transparent !important; }
-        .sd-root-modern .sd-question { padding: 0 !important; }
-        .sd-root-modern .sd-selectbase { padding: 0 !important; border: none !important; }
-        
-        /* Score Circle */
-        .score-circle { position: relative; width: 140px; height: 140px; }
-        .score-circle svg { transform: rotate(-90deg); }
-        .score-circle-bg { fill: none; stroke: var(--border); stroke-width: 10; }
-        .score-circle-progress { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 1.2s ease; }
-        .score-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
-        .stat-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* SurveyJS Customization */
+        .sd-root-modern { --primary: var(--accent) !important; }
+        .sd-container-modern { padding: 0 !important; }
     </style>
 </head>
 <body class="antialiased">
-    <div class="bg-pattern"></div>
+    <div class="bg-clean"></div>
 
-    <!-- Header -->
-    <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-l-0 border-r-0">
+    <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-x-0">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--accent);">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-600">
                     <i class="fab fa-python text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-base font-bold" style="color: var(--text-primary);">Python Quiz</h1>
-                    <p id="header-subtitle" class="text-xs" style="color: var(--text-muted);">نظام الاختبارات</p>
+                    <h1 class="text-base font-bold">Python Quiz</h1>
+                    <p id="header-subtitle" class="text-xs text-gray-500">نظام الاختبارات</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
                 <div id="timer-wrapper" class="hidden">
-                    <div id="timer-container" class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: var(--bg-tertiary); border: 1px solid var(--border);">
-                        <svg class="timer-ring" width="32" height="32">
-                            <circle class="timer-ring-bg" stroke-width="3" fill="transparent" r="13" cx="16" cy="16"/>
-                            <circle id="timer-progress" class="timer-ring-progress" stroke-width="3" fill="transparent" r="13" cx="16" cy="16" stroke-dasharray="81.7" stroke-dashoffset="0" stroke-linecap="round"/>
+                    <div id="timer-container" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200">
+                        <svg class="timer-ring" width="24" height="24">
+                            <circle stroke="#e2e8f0" stroke-width="2" fill="transparent" r="10" cx="12" cy="12"/>
+                            <circle id="timer-progress" stroke="var(--accent)" stroke-width="2" fill="transparent" r="10" cx="12" cy="12" stroke-dasharray="62.8" stroke-dashoffset="0" stroke-linecap="round"/>
                         </svg>
-                        <div class="text-right">
-                            <div id="timer-display" class="text-base font-bold font-mono" style="color: var(--text-primary);">00:00</div>
-                        </div>
+                        <span id="timer-display" class="font-mono font-bold text-sm">00:00</span>
                     </div>
                 </div>
-                <button id="theme-toggle" class="theme-toggle" aria-label="تبديل السمة">
+                <button id="theme-toggle" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50">
                     <i id="theme-icon" class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="relative z-10 container mx-auto px-4 pt-24 pb-8 min-h-screen">
+    <main class="relative z-10 container mx-auto px-4 pt-24 pb-8">
         
-        <!-- Loading State -->
-        <div id="loading-state" class="flex flex-col items-center justify-center min-h-[70vh]">
-            <div class="card p-8 text-center fade-in max-w-md w-full">
-                <div class="spinner mx-auto mb-4"></div>
-                <h2 class="text-lg font-bold mb-1" style="color: var(--text-primary);">جاري تحميل الاختبار</h2>
-                <p id="loading-message" style="color: var(--text-secondary);">يرجى الانتظار...</p>
-            </div>
+        <div id="loading-state" class="flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="spinner mb-4"></div>
+            <p id="loading-message" class="text-gray-500">جاري الاتصال...</p>
         </div>
 
-        <!-- Error State -->
-        <div id="error-state" class="hidden">
-            <div class="max-w-lg mx-auto card p-8 text-center fade-in">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(220, 38, 38, 0.1);">
-                    <i class="fas fa-exclamation-triangle text-3xl" style="color: var(--danger);"></i>
-                </div>
-                <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">حدث خطأ</h2>
-                <p id="error-message" class="mb-5" style="color: var(--text-secondary);"></p>
-                <button onclick="location.reload()" class="btn-primary">
-                    <i class="fas fa-redo ml-2"></i>
-                    إعادة المحاولة
-                </button>
-            </div>
+        <div id="error-state" class="hidden max-w-md mx-auto card p-8 text-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+            <h2 class="text-xl font-bold mb-2">عذراً، حدث خطأ</h2>
+            <p id="error-message" class="text-gray-600 mb-6"></p>
+            <button onclick="location.reload()" class="btn-primary w-full">إعادة المحاولة</button>
         </div>
 
-        <!-- Start Form (New) -->
-        <div id="start-form-state" class="hidden">
-            <div class="max-w-lg mx-auto card p-6 fade-in">
-                <div class="text-center mb-6">
-                    <h2 id="start-exam-title" class="text-xl font-bold" style="color: var(--text-primary);">عنوان الاختبار</h2>
-                    <p id="start-exam-desc" class="text-sm mt-1" style="color: var(--text-secondary);"></p>
+        <div id="start-form-state" class="hidden max-w-lg mx-auto card p-8">
+            <h2 id="start-exam-title" class="text-2xl font-bold text-center mb-2"></h2>
+            <p id="start-exam-desc" class="text-center text-gray-500 mb-8"></p>
+            <form id="student-info-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">الاسم الكامل</label>
+                    <input type="text" id="student-name" class="input-field" placeholder="أدخل اسمك الثلاثي" required>
                 </div>
-                
-                <form id="student-info-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" style="color: var(--text-secondary);">الاسم الكامل</label>
-                        <input type="text" id="student-name" class="input-field" placeholder="أدخل اسمك" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" style="color: var(--text-secondary);">البريد الإلكتروني</label>
-                        <input type="email" id="student-email" class="input-field text-left" placeholder="example@email.com" required>
-                    </div>
-                    <button type="submit" class="btn-primary w-full">
-                        <i class="fas fa-play ml-2"></i>
-                        بدء الاختبار
-                    </button>
-                </form>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">البريد الإلكتروني</label>
+                    <input type="email" id="student-email" class="input-field text-left" placeholder="name@example.com" required>
+                </div>
+                <button type="submit" class="btn-primary w-full mt-4">ابدأ الاختبار الآن</button>
+            </form>
         </div>
 
-        <!-- Survey Container -->
-        <div id="survey-wrapper" class="hidden">
-            <div id="exam-info" class="card p-4 mb-4 fade-in">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h2 id="exam-title" class="text-lg font-bold" style="color: var(--text-primary);"></h2>
-                        <p id="exam-description" class="text-sm" style="color: var(--text-secondary);"></p>
-                    </div>
-                    <div class="flex items-center gap-5">
-                        <div class="text-center">
-                            <div id="questions-count" class="text-xl font-bold" style="color: var(--accent);">0</div>
-                            <div class="text-xs" style="color: var(--text-muted);">سؤال</div>
-                        </div>
-                        <div class="text-center">
-                            <div id="duration-display" class="text-xl font-bold" style="color: var(--accent);">0</div>
-                            <div class="text-xs" style="color: var(--text-muted);">دقيقة</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card p-5 fade-in">
-                <div id="surveyContainer"></div>
-            </div>
+        <div id="survey-wrapper" class="hidden max-w-4xl mx-auto">
+            <div id="surveyContainer"></div>
         </div>
 
-        <!-- Submitting State -->
-        <div id="submitting-state" class="hidden">
-            <div class="flex flex-col items-center justify-center min-h-[70vh]">
-                <div class="card p-8 text-center fade-in max-w-md w-full">
-                    <div class="spinner mx-auto mb-4"></div>
-                    <h2 class="text-lg font-bold mb-1" style="color: var(--text-primary);">جاري تصحيح الإجابات</h2>
-                    <p style="color: var(--text-secondary);">يرجى الانتظار...</p>
+        <div id="success-state" class="hidden max-w-2xl mx-auto card p-8 text-center">
+            <div id="result-icon" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4"></div>
+            <h2 id="result-title" class="text-3xl font-black mb-2"></h2>
+            <p id="result-message" class="text-gray-500 mb-8"></p>
+            
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <span class="block text-2xl font-bold text-blue-600" id="score-percentage">0%</span>
+                    <span class="text-xs text-gray-400">النسبة</span>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <span class="block text-2xl font-bold" id="score-value">0</span>
+                    <span class="text-xs text-gray-400">درجتك</span>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <span class="block text-2xl font-bold" id="time-spent">0</span>
+                    <span class="text-xs text-gray-400">الدقائق</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Success State -->
-        <div id="success-state" class="hidden">
-            <div class="max-w-xl mx-auto">
-                <div class="card p-6 text-center fade-in">
-                    <div id="result-icon" class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"></div>
-                    <h2 id="result-title" class="text-2xl font-bold mb-1" style="color: var(--text-primary);"></h2>
-                    <p id="result-message" class="mb-6" style="color: var(--text-secondary);"></p>
-
-                    <div class="flex justify-center mb-6">
-                        <div class="score-circle">
-                            <svg width="140" height="140" viewBox="0 0 140 140">
-                                <circle class="score-circle-bg" cx="70" cy="70" r="60"/>
-                                <circle id="score-progress" class="score-circle-progress" cx="70" cy="70" r="60"/>
-                            </svg>
-                            <div class="score-value">
-                                <span id="score-percentage" class="text-3xl font-black" style="color: var(--text-primary);">0%</span>
-                                <span class="text-xs" style="color: var(--text-muted);">النتيجة</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-3 mb-6">
-                        <div class="stat-card">
-                            <div id="score-value" class="text-2xl font-bold" style="color: var(--accent);">0</div>
-                            <div class="text-xs" style="color: var(--text-muted);">درجتك</div>
-                        </div>
-                        <div class="stat-card">
-                            <div id="max-value" class="text-2xl font-bold" style="color: var(--success);">0</div>
-                            <div class="text-xs" style="color: var(--text-muted);">الكاملة</div>
-                        </div>
-                        <div class="stat-card">
-                            <div id="time-spent" class="text-2xl font-bold" style="color: var(--text-secondary);">0</div>
-                            <div class="text-xs" style="color: var(--text-muted);">دقيقة</div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center">
-                        <button onclick="window.print()" class="btn-primary" style="background: var(--bg-tertiary); color: var(--text-primary);">
-                            <i class="fas fa-print ml-2"></i>
-                            طباعة النتيجة
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <button onclick="window.print()" class="text-blue-600 font-semibold hover:underline">طباعة التقرير</button>
         </div>
     </main>
 
@@ -303,256 +174,145 @@
         };
 
         const state = {
-            examId: '', examToken: '', timeLimit: 0, startTime: null,
-            timerInterval: null, survey: null, examData: null, isDark: false,
-            studentName: '', studentEmail: '' // Added student info
+            examId: '', token: '', examData: null,
+            startTime: null, timerInterval: null,
+            studentName: '', studentEmail: ''
         };
 
         const DOM = {
             loadingState: document.getElementById('loading-state'),
-            loadingMessage: document.getElementById('loading-message'),
             errorState: document.getElementById('error-state'),
-            errorMessage: document.getElementById('error-message'),
-            startFormState: document.getElementById('start-form-state'), // New
-            studentInfoForm: document.getElementById('student-info-form'), // New
-            startExamTitle: document.getElementById('start-exam-title'), // New
-            startExamDesc: document.getElementById('start-exam-desc'), // New
+            startFormState: document.getElementById('start-form-state'),
             surveyWrapper: document.getElementById('survey-wrapper'),
-            surveyContainer: document.getElementById('surveyContainer'),
-            submittingState: document.getElementById('submitting-state'),
             successState: document.getElementById('success-state'),
             timerWrapper: document.getElementById('timer-wrapper'),
-            timerContainer: document.getElementById('timer-container'),
-            timerDisplay: document.getElementById('timer-display'),
-            timerProgress: document.getElementById('timer-progress'),
-            examTitle: document.getElementById('exam-title'),
-            examDescription: document.getElementById('exam-description'),
-            questionsCount: document.getElementById('questions-count'),
-            durationDisplay: document.getElementById('duration-display'),
-            headerSubtitle: document.getElementById('header-subtitle'),
-            themeToggle: document.getElementById('theme-toggle'),
-            themeIcon: document.getElementById('theme-icon')
+            timerDisplay: document.getElementById('timer-display')
         };
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initTheme();
-            initExam();
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            state.examId = urlParams.get('exam') || urlParams.get('exam_id');
+            state.token = urlParams.get('token');
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('quiz-theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            state.isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-            applyTheme();
-            DOM.themeToggle.addEventListener('click', toggleTheme);
-        }
-
-        function toggleTheme() {
-            state.isDark = !state.isDark;
-            localStorage.setItem('quiz-theme', state.isDark ? 'dark' : 'light');
-            applyTheme();
-        }
-
-        function applyTheme() {
-            if (state.isDark) {
-                document.documentElement.classList.add('dark');
-                DOM.themeIcon.className = 'fas fa-sun';
-            } else {
-                document.documentElement.classList.remove('dark');
-                DOM.themeIcon.className = 'fas fa-moon';
-            }
-        }
-
-        async function initExam() {
-            const params = getUrlParams();
-            if (!params.examId || !params.examToken) {
-                showError('معرف الاختبار أو الرمز مفقود', 'تأكد من أن الرابط صحيح');
+            if (!state.examId) {
+                showError("رابط غير صالح", "معرف الاختبار مفقود من الرابط.");
                 return;
             }
-            state.examId = params.examId;
-            state.examToken = params.examToken;
-            await loadSurveyData();
-        }
+            fetchSurvey();
+            
+            // Theme toggle
+            document.getElementById('theme-toggle').onclick = () => {
+                document.documentElement.classList.toggle('dark');
+            };
+        });
 
-        function getUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return { examId: urlParams.get('exam') || urlParams.get('exam_id'), examToken: urlParams.get('token') };
-        }
-
-        async function loadSurveyData() {
+        async function fetchSurvey() {
             try {
-                DOM.loadingMessage.textContent = 'جاري الاتصال بالخادم...';
-                const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam=${state.examId}&token=${state.examToken}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
-                if (!response.ok) throw new Error('خطأ في الاتصال (' + response.status + ')');
-                const data = await response.json();
-                if (data.error || data.success === false) throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
+                const res = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam_id=${state.examId}&token=${state.token}`);
+                const data = await res.json();
+                
+                if (data.error || !data.pages || data.pages[0].elements.length === 0) {
+                    throw new Error(data.message || "لا توجد أسئلة متوفرة لهذا الاختبار حالياً.");
+                }
                 
                 state.examData = data;
-                showStartForm(data); // Show form first instead of starting immediately
-            } catch (error) {
-                console.error('Load Error:', error);
-                showError('فشل الاتصال بالخادم', error.message);
+                showStartForm(data);
+            } catch (e) {
+                showError("خطأ في التحميل", e.message);
             }
         }
 
         function showStartForm(data) {
-    DOM.loadingState.classList.add('hidden');
-    DOM.startFormState.classList.remove('hidden');
-    
-    // تأكد من الوصول للأسئلة بشكل صحيح
-    const questions = data.pages?.[0]?.elements || [];
-    
-    DOM.startExamTitle.textContent = data.title || 'اختبار';
-    // هنا قمنا بالتأكد من عدد الأسئلة
-    DOM.startExamDesc.textContent = `المدة: ${data.durationMin || 15} دقيقة | ${questions.length} أسئلة`;
-    
-    DOM.studentInfoForm.addEventListener('submit', handleStartExam);
-}
-
-        // Handle form submission
-        function handleStartExam(e) {
-            e.preventDefault();
-            state.studentName = document.getElementById('student-name').value.trim();
-            state.studentEmail = document.getElementById('student-email').value.trim();
+            DOM.loadingState.classList.add('hidden');
+            DOM.startFormState.classList.remove('hidden');
+            document.getElementById('start-exam-title').textContent = data.title;
+            document.getElementById('start-exam-desc').textContent = `${data.pages[0].elements.length} سؤال | ${data.durationMin || 15} دقيقة`;
             
-            if(!state.studentName || !state.studentEmail) return;
-            
-            DOM.startFormState.classList.add('hidden');
-            initializeExam(state.examData);
+            document.getElementById('student-info-form').onsubmit = (e) => {
+                e.preventDefault();
+                state.studentName = document.getElementById('student-name').value;
+                state.studentEmail = document.getElementById('student-email').value;
+                startExam();
+            };
         }
 
-        function initializeExam(data) {
-            DOM.examTitle.textContent = data.title || 'اختبار';
-            DOM.headerSubtitle.textContent = data.title || 'نظام الاختبارات';
-            DOM.examDescription.textContent = data.description || '';
-            DOM.questionsCount.textContent = data.pages?.[0]?.elements?.length || 0;
-            const durationMin = parseInt(data.durationMin || data.duration_min || 15);
-            DOM.durationDisplay.textContent = durationMin;
-            state.timeLimit = durationMin * 60;
-            state.startTime = Date.now();
-            
-            initializeSurvey(data);
-            startTimer();
-            
+        function startExam() {
+            DOM.startFormState.classList.add('hidden');
             DOM.surveyWrapper.classList.remove('hidden');
             DOM.timerWrapper.classList.remove('hidden');
+            
+            state.startTime = Date.now();
+            const survey = new Survey.Model(state.examData);
+            survey.locale = 'ar';
+            
+            survey.onComplete.add(result => submitAnswers(result.data));
+            
+            // الإصلاح الجوهري هنا
+            survey.render("surveyContainer");
+            
+            startTimer(state.examData.durationMin || 15);
         }
 
-        function initializeSurvey(surveyJSON) {
-            Survey.surveyLocalization.currentLocale = 'ar';
-            state.survey = new Survey.Model(surveyJSON);
-            state.survey.onComplete.add(function(sender) { submitExam(sender.data); });
-            DOM.surveyContainer.appendChild(state.survey.render());
-        }
-
-        function startTimer() {
-            updateTimerDisplay();
-            state.timerInterval = setInterval(function() {
-                const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-                const remaining = Math.max(0, state.timeLimit - elapsed);
-                updateTimerDisplay(remaining);
-                updateTimerProgress(remaining);
-                if (remaining <= 60) DOM.timerContainer.classList.add('timer-warning');
-                if (remaining <= 0) {
+        function startTimer(mins) {
+            let timeLeft = mins * 60;
+            state.timerInterval = setInterval(() => {
+                timeLeft--;
+                const m = Math.floor(timeLeft / 60);
+                const s = timeLeft % 60;
+                DOM.timerDisplay.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
                     clearInterval(state.timerInterval);
-                    state.timerInterval = null;
-                    if (state.survey) state.survey.completeLastPage();
+                    alert("انتهى الوقت! سيتم تسليم الإجابات تلقائياً.");
+                    Survey.getSurveyById("surveyContainer")?.completeLastPage();
                 }
             }, 1000);
         }
 
-        function updateTimerDisplay(remaining) {
-            if (typeof remaining === 'undefined') remaining = state.timeLimit;
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-            DOM.timerDisplay.textContent = mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
-        }
-
-        function updateTimerProgress(remaining) {
-            const progress = remaining / state.timeLimit;
-            const circumference = 2 * Math.PI * 13;
-            const offset = circumference * (1 - progress);
-            DOM.timerProgress.style.strokeDashoffset = offset;
-        }
-
-        async function submitExam(answers) {
-            if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+        async function submitAnswers(answers) {
+            clearInterval(state.timerInterval);
             DOM.surveyWrapper.classList.add('hidden');
-            DOM.timerWrapper.classList.add('hidden');
-            DOM.submittingState.classList.remove('hidden');
+            DOM.loadingState.classList.remove('hidden');
+            document.getElementById('loading-message').textContent = "جاري تصحيح الاختبار...";
 
             try {
-                const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SUBMIT_EXAM}`, {
+                const res = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SUBMIT_EXAM}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        exam: state.examId,
-                        token: state.examToken,
-                        answers: answers,
-                        finishedAt: new Date().toISOString(),
-                        studentName: state.studentName,    // Send Name
-                        studentEmail: state.studentEmail   // Send Email
+                        exam_id: state.examId,
+                        studentName: state.studentName,
+                        studentEmail: state.studentEmail,
+                        answers: answers
                     })
                 });
-                if (!response.ok) throw new Error('خطأ في إرسال الإجابات');
-                const result = await response.json();
-                showSuccess(result);
-            } catch (error) {
-                console.error('Submit Error:', error);
-                showSuccess({ score: 0, max: 0 });
+                const result = await res.json();
+                showResult(result);
+            } catch (e) {
+                showError("خطأ في الإرسال", "لم نتمكن من إرسال إجاباتك. يرجى تصوير الشاشة.");
             }
         }
 
-        function showError(title, message) {
+        function showResult(result) {
+            DOM.loadingState.classList.add('hidden');
+            DOM.successState.classList.remove('hidden');
+            DOM.timerWrapper.classList.add('hidden');
+
+            const score = result.score || 0;
+            const max = result.max || 10;
+            const percent = Math.round((score / max) * 100);
+
+            document.getElementById('score-percentage').textContent = percent + '%';
+            document.getElementById('score-value').textContent = score;
+            document.getElementById('result-title').textContent = percent >= 50 ? "مبارك النجاح!" : "حظاً أوفر!";
+            
+            if (percent >= 80) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function showError(t, m) {
             DOM.loadingState.classList.add('hidden');
             DOM.errorState.classList.remove('hidden');
-            document.querySelector('#error-state h2').textContent = title;
-            DOM.errorMessage.textContent = message;
-        }
-
-        function showSuccess(result) {
-            DOM.submittingState.classList.add('hidden');
-            DOM.successState.classList.remove('hidden');
-            const score = result.score || 0;
-            const max = result.max || 100;
-            const percentage = max > 0 ? Math.round((score / max) * 100) : 0;
-            const timeSpent = state.startTime ? Math.round((Date.now() - state.startTime) / 60000) : 0;
-
-            const resultIcon = document.getElementById('result-icon');
-            const resultTitle = document.getElementById('result-title');
-            const resultMessage = document.getElementById('result-message');
-
-            if (percentage >= 80) {
-                resultIcon.innerHTML = '<i class="fas fa-trophy text-4xl" style="color: #f59e0b;"></i>';
-                resultIcon.style.background = 'rgba(245, 158, 11, 0.15)';
-                resultTitle.textContent = 'ممتاز!';
-                resultMessage.textContent = 'أداء رائع!';
-                if (typeof confetti !== 'undefined') confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#2563eb', '#059669', '#f59e0b'] });
-            } else if (percentage >= 60) {
-                resultIcon.innerHTML = '<i class="fas fa-thumbs-up text-4xl" style="color: var(--success);"></i>';
-                resultIcon.style.background = 'rgba(5, 150, 105, 0.15)';
-                resultTitle.textContent = 'جيد!';
-                resultMessage.textContent = 'استمر في التعلم';
-            } else {
-                resultIcon.innerHTML = '<i class="fas fa-book text-4xl" style="color: var(--text-secondary);"></i>';
-                resultIcon.style.background = 'var(--bg-tertiary)';
-                resultTitle.textContent = 'حاول مرة أخرى';
-                resultMessage.textContent = 'تحتاج لمزيد من المراجعة';
-            }
-
-            document.getElementById('score-value').textContent = score;
-            document.getElementById('max-value').textContent = max;
-            document.getElementById('time-spent').textContent = timeSpent;
-            document.getElementById('score-percentage').textContent = percentage + '%';
-
-            setTimeout(function() {
-                const circleProgress = document.getElementById('score-progress');
-                if (circleProgress) {
-                    const circumference = 2 * Math.PI * 60;
-                    const offset = circumference - (percentage / 100) * circumference;
-                    circleProgress.style.strokeDashoffset = offset;
-                }
-            }, 100);
+            document.getElementById('error-message').textContent = m;
         }
     </script>
 </body>
