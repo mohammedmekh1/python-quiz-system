@@ -16,10 +16,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        /* نفس التنسيقات السابقة */
+        /* Light Mode */
         :root {
             --bg-primary: #f5f7fa;
             --bg-secondary: #ffffff;
@@ -35,6 +50,8 @@
             --success: #059669;
             --danger: #dc2626;
         }
+        
+        /* Dark Mode */
         .dark {
             --bg-primary: #0d1117;
             --bg-secondary: #161b22;
@@ -50,83 +67,295 @@
             --success: #3fb950;
             --danger: #f85149;
         }
-        * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
-        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
-        .bg-pattern { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.3; }
-        .dark .bg-pattern { opacity: 0.1; }
-        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px var(--shadow); }
-        .spinner { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .timer-ring { transform: rotate(-90deg); }
-        .timer-ring-bg { stroke: var(--border); }
-        .timer-ring-progress { stroke: var(--accent); transition: stroke-dashoffset 1s linear; }
-        .timer-warning .timer-ring-progress { stroke: var(--danger); }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Form Inputs */
-        .input-field {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
+        * {
             font-family: 'Cairo', sans-serif;
-            font-size: 1rem;
-            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
-        .input-field:focus { outline: none; border-color: var(--accent); background: var(--bg-secondary); }
-        .input-field::placeholder { color: var(--text-muted); }
         
-        /* Buttons */
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            font-weight: 600;
-            padding: 12px 24px;
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Subtle Grid Pattern */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+        
+        .dark .bg-pattern {
+            opacity: 0.1;
+        }
+        
+        /* Card */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Timer Ring */
+        .timer-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .timer-ring-bg {
+            stroke: var(--border);
+        }
+        
+        .timer-ring-progress {
+            stroke: var(--accent);
+            transition: stroke-dashoffset 1s linear;
+        }
+        
+        .timer-warning .timer-ring-progress {
+            stroke: var(--danger);
+        }
+        
+        /* Fade In */
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Pulse */
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        
+        /* Score Circle */
+        .score-circle {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+        
+        .score-circle-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 10;
+        }
+        
+        .score-circle-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 1.2s ease;
+        }
+        
+        .score-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
-            border: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
         
-        .theme-toggle {
-            width: 40px; height: 40px; border-radius: 10px; background: var(--bg-tertiary); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+        .theme-toggle:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
         }
-        .theme-toggle:hover { background: var(--accent-light); border-color: var(--accent); }
-        .theme-toggle i { color: var(--text-secondary); font-size: 1rem; }
         
-        /* SurveyJS Overrides */
-        .sd-root-modern { --primary: var(--accent) !important; --primary-light: var(--accent-light) !important; --background: var(--bg-secondary) !important; --background-dim: var(--bg-tertiary) !important; --foreground: var(--text-primary) !important; --foreground-light: var(--text-secondary) !important; --border: var(--border) !important; --corner-radius: 10px !important; }
-        .sd-root-modern .sd-item { background: var(--bg-tertiary) !important; border: 2px solid var(--border) !important; border-radius: 10px !important; padding: 12px 16px !important; margin-bottom: 8px !important; transition: all 0.2s ease !important; }
-        .sd-root-modern .sd-item:hover { border-color: var(--accent) !important; }
-        .sd-root-modern .sd-item--checked { border-color: var(--accent) !important; background: var(--accent-light) !important; }
-        .sd-root-modern .sd-item__control-label { color: var(--text-primary) !important; font-family: 'Cairo', sans-serif !important; }
-        .sd-root-modern .sd-btn { background: var(--accent) !important; color: white !important; font-family: 'Cairo', sans-serif !important; font-weight: 600 !important; border-radius: 10px !important; padding: 10px 24px !important; border: none !important; }
-        .sd-root-modern .sd-btn:hover { background: var(--accent-hover) !important; }
-        .sd-root-modern .sd-navigation__complete-btn { background: var(--success) !important; }
-        .sd-root-modern .sd-body, .sd-root-modern .sd-page, .sd-root-modern .sd-panel { background: transparent !important; }
-        .sd-root-modern .sd-question { padding: 0 !important; }
-        .sd-root-modern .sd-selectbase { padding: 0 !important; border: none !important; }
+        .theme-toggle i {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
         
-        /* Score Circle */
-        .score-circle { position: relative; width: 140px; height: 140px; }
-        .score-circle svg { transform: rotate(-90deg); }
-        .score-circle-bg { fill: none; stroke: var(--border); stroke-width: 10; }
-        .score-circle-progress { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 1.2s ease; }
-        .score-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* SurveyJS Custom Styles */
+        .sd-root-modern {
+            --primary: var(--accent) !important;
+            --primary-light: var(--accent-light) !important;
+            --background: var(--bg-secondary) !important;
+            --background-dim: var(--bg-tertiary) !important;
+            --foreground: var(--text-primary) !important;
+            --foreground-light: var(--text-secondary) !important;
+            --border: var(--border) !important;
+            --corner-radius: 10px !important;
+        }
         
-        .stat-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+        .sd-root-modern .sd-title {
+            font-family: 'Cairo', sans-serif !important;
+            color: var(--text-primary) !important;
+        }
         
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .sd-root-modern .sd-description {
+            color: var(--text-secondary) !important;
+        }
+        
+        .sd-root-modern .sd-question__title {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .sd-root-modern .sd-item {
+            background: var(--bg-tertiary) !important;
+            border: 2px solid var(--border) !important;
+            border-radius: 10px !important;
+            padding: 12px 16px !important;
+            margin-bottom: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .sd-root-modern .sd-item:hover {
+            border-color: var(--accent) !important;
+        }
+        
+        .sd-root-modern .sd-item--checked {
+            border-color: var(--accent) !important;
+            background: var(--accent-light) !important;
+        }
+        
+        .sd-root-modern .sd-item__control-label {
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .sd-root-modern .sd-btn {
+            background: var(--accent) !important;
+            color: white !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .sd-root-modern .sd-btn:hover {
+            background: var(--accent-hover) !important;
+            transform: translateY(-1px);
+        }
+        
+        .sd-root-modern .sd-navigation__complete-btn {
+            background: var(--success) !important;
+        }
+        
+        .sd-root-modern .sd-body,
+        .sd-root-modern .sd-page,
+        .sd-root-modern .sd-panel {
+            background: transparent !important;
+        }
+        
+        .sd-root-modern .sd-question {
+            padding: 0 !important;
+        }
+        
+        .sd-root-modern .sd-selectbase {
+            padding: 0 !important;
+            border: none !important;
+        }
+        
+        .sd-root-modern .sd-progress-buttons {
+            background: var(--bg-tertiary) !important;
+            border-radius: 10px !important;
+            padding: 8px !important;
+        }
+        
+        .sd-root-modern pre {
+            background: var(--bg-primary) !important;
+            border-radius: 8px !important;
+            padding: 14px !important;
+            direction: ltr !important;
+            text-align: left !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+        
+        /* Stat Card */
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
+    <!-- Background Pattern -->
     <div class="bg-pattern"></div>
 
     <!-- Header -->
@@ -143,6 +372,7 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <!-- Timer -->
                 <div id="timer-wrapper" class="hidden">
                     <div id="timer-container" class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: var(--bg-tertiary); border: 1px solid var(--border);">
                         <svg class="timer-ring" width="32" height="32">
@@ -154,6 +384,8 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Theme Toggle -->
                 <button id="theme-toggle" class="theme-toggle" aria-label="تبديل السمة">
                     <i id="theme-icon" class="fas fa-moon"></i>
                 </button>
@@ -181,40 +413,16 @@
                 </div>
                 <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">حدث خطأ</h2>
                 <p id="error-message" class="mb-5" style="color: var(--text-secondary);"></p>
-                <button onclick="location.reload()" class="btn-primary">
+                <button onclick="location.reload()" class="px-6 py-2 rounded-lg font-semibold text-white" style="background: var(--accent);">
                     <i class="fas fa-redo ml-2"></i>
                     إعادة المحاولة
                 </button>
             </div>
         </div>
 
-        <!-- Start Form (New) -->
-        <div id="start-form-state" class="hidden">
-            <div class="max-w-lg mx-auto card p-6 fade-in">
-                <div class="text-center mb-6">
-                    <h2 id="start-exam-title" class="text-xl font-bold" style="color: var(--text-primary);">عنوان الاختبار</h2>
-                    <p id="start-exam-desc" class="text-sm mt-1" style="color: var(--text-secondary);"></p>
-                </div>
-                
-                <form id="student-info-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" style="color: var(--text-secondary);">الاسم الكامل</label>
-                        <input type="text" id="student-name" class="input-field" placeholder="أدخل اسمك" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" style="color: var(--text-secondary);">البريد الإلكتروني</label>
-                        <input type="email" id="student-email" class="input-field text-left" placeholder="example@email.com" required>
-                    </div>
-                    <button type="submit" class="btn-primary w-full">
-                        <i class="fas fa-play ml-2"></i>
-                        بدء الاختبار
-                    </button>
-                </form>
-            </div>
-        </div>
-
         <!-- Survey Container -->
         <div id="survey-wrapper" class="hidden">
+            <!-- Exam Info -->
             <div id="exam-info" class="card p-4 mb-4 fade-in">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
@@ -233,6 +441,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SurveyJS -->
             <div class="card p-5 fade-in">
                 <div id="surveyContainer"></div>
             </div>
@@ -253,10 +463,13 @@
         <div id="success-state" class="hidden">
             <div class="max-w-xl mx-auto">
                 <div class="card p-6 text-center fade-in">
+                    <!-- Result Icon -->
                     <div id="result-icon" class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"></div>
+                    
                     <h2 id="result-title" class="text-2xl font-bold mb-1" style="color: var(--text-primary);"></h2>
                     <p id="result-message" class="mb-6" style="color: var(--text-secondary);"></p>
 
+                    <!-- Score Circle -->
                     <div class="flex justify-center mb-6">
                         <div class="score-circle">
                             <svg width="140" height="140" viewBox="0 0 140 140">
@@ -270,6 +483,7 @@
                         </div>
                     </div>
 
+                    <!-- Stats -->
                     <div class="grid grid-cols-3 gap-3 mb-6">
                         <div class="stat-card">
                             <div id="score-value" class="text-2xl font-bold" style="color: var(--accent);">0</div>
@@ -285,8 +499,9 @@
                         </div>
                     </div>
 
+                    <!-- Actions -->
                     <div class="flex justify-center">
-                        <button onclick="window.print()" class="btn-primary" style="background: var(--bg-tertiary); color: var(--text-primary);">
+                        <button onclick="window.print()" class="px-6 py-2 rounded-lg font-semibold" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border);">
                             <i class="fas fa-print ml-2"></i>
                             طباعة النتيجة
                         </button>
@@ -296,27 +511,41 @@
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="relative z-10 card mt-8 rounded-none border-b-0 border-l-0 border-r-0 py-3">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-xs" style="color: var(--text-muted);">Python Quiz System - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
     <script>
+        // ===== Configuration =====
         const CONFIG = {
             BASE_URL: 'https://n8n.srv1332143.hstgr.cloud/webhook',
-            ENDPOINTS: { GET_SURVEY: '/get-survey', SUBMIT_EXAM: '/submit-exam' }
+            ENDPOINTS: {
+                GET_SURVEY: '/get-survey',
+                SUBMIT_EXAM: '/submit-exam'
+            }
         };
 
+        // ===== State =====
         const state = {
-            examId: '', examToken: '', timeLimit: 0, startTime: null,
-            timerInterval: null, survey: null, examData: null, isDark: false,
-            studentName: '', studentEmail: '' // Added student info
+            examId: '',
+            examToken: '',
+            timeLimit: 0,
+            startTime: null,
+            timerInterval: null,
+            survey: null,
+            examData: null,
+            isDark: false
         };
 
+        // ===== DOM Elements =====
         const DOM = {
             loadingState: document.getElementById('loading-state'),
             loadingMessage: document.getElementById('loading-message'),
             errorState: document.getElementById('error-state'),
             errorMessage: document.getElementById('error-message'),
-            startFormState: document.getElementById('start-form-state'), // New
-            studentInfoForm: document.getElementById('student-info-form'), // New
-            startExamTitle: document.getElementById('start-exam-title'), // New
-            startExamDesc: document.getElementById('start-exam-desc'), // New
             surveyWrapper: document.getElementById('survey-wrapper'),
             surveyContainer: document.getElementById('surveyContainer'),
             submittingState: document.getElementById('submitting-state'),
@@ -334,16 +563,20 @@
             themeIcon: document.getElementById('theme-icon')
         };
 
+        // ===== Initialize =====
         document.addEventListener('DOMContentLoaded', function() {
             initTheme();
             initExam();
         });
 
+        // ===== Theme =====
         function initTheme() {
             const savedTheme = localStorage.getItem('quiz-theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
             state.isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
             applyTheme();
+            
             DOM.themeToggle.addEventListener('click', toggleTheme);
         }
 
@@ -363,74 +596,78 @@
             }
         }
 
+        // ===== Exam =====
         async function initExam() {
             const params = getUrlParams();
+            
             if (!params.examId || !params.examToken) {
                 showError('معرف الاختبار أو الرمز مفقود', 'تأكد من أن الرابط صحيح');
                 return;
             }
+
             state.examId = params.examId;
             state.examToken = params.examToken;
+
             await loadSurveyData();
         }
 
         function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
-            return { examId: urlParams.get('exam') || urlParams.get('exam_id'), examToken: urlParams.get('token') };
+            return {
+                examId: urlParams.get('exam') || urlParams.get('exam_id'),
+                examToken: urlParams.get('token')
+            };
         }
 
         async function loadSurveyData() {
             try {
                 DOM.loadingMessage.textContent = 'جاري الاتصال بالخادم...';
-                const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam=${state.examId}&token=${state.examToken}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
-                if (!response.ok) throw new Error('خطأ في الاتصال (' + response.status + ')');
-                const data = await response.json();
-                if (data.error || data.success === false) throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
                 
+                const response = await fetch(
+                    `${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam=${state.examId}&token=${state.examToken}`,
+                    {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطأ في الاتصال (' + response.status + ')');
+                }
+
+                const data = await response.json();
+
+                if (data.error || data.success === false) {
+                    throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
+                }
+
                 state.examData = data;
-                showStartForm(data); // Show form first instead of starting immediately
+                initializeExam(data);
+
             } catch (error) {
                 console.error('Load Error:', error);
                 showError('فشل الاتصال بالخادم', error.message);
             }
         }
 
-        // New function to show start form
-        function showStartForm(data) {
-            DOM.loadingState.classList.add('hidden');
-            DOM.startFormState.classList.remove('hidden');
-            
-            DOM.startExamTitle.textContent = data.title || 'اختبار';
-            DOM.startExamDesc.textContent = `المدة: ${data.durationMin || data.duration_min || 15} دقيقة | ${data.pages?.[0]?.elements?.length || 0} أسئلة`;
-            
-            DOM.studentInfoForm.addEventListener('submit', handleStartExam);
-        }
-
-        // Handle form submission
-        function handleStartExam(e) {
-            e.preventDefault();
-            state.studentName = document.getElementById('student-name').value.trim();
-            state.studentEmail = document.getElementById('student-email').value.trim();
-            
-            if(!state.studentName || !state.studentEmail) return;
-            
-            DOM.startFormState.classList.add('hidden');
-            initializeExam(state.examData);
-        }
-
         function initializeExam(data) {
             DOM.examTitle.textContent = data.title || 'اختبار';
             DOM.headerSubtitle.textContent = data.title || 'نظام الاختبارات';
             DOM.examDescription.textContent = data.description || '';
-            DOM.questionsCount.textContent = data.pages?.[0]?.elements?.length || 0;
+            
+            const questionsLength = data.pages?.[0]?.elements?.length || 0;
+            DOM.questionsCount.textContent = questionsLength;
+            
             const durationMin = parseInt(data.durationMin || data.duration_min || 15);
             DOM.durationDisplay.textContent = durationMin;
+            
             state.timeLimit = durationMin * 60;
             state.startTime = Date.now();
-            
+
             initializeSurvey(data);
             startTimer();
-            
+
+            DOM.loadingState.classList.add('hidden');
             DOM.surveyWrapper.classList.remove('hidden');
             DOM.timerWrapper.classList.remove('hidden');
         }
@@ -438,28 +675,43 @@
         function initializeSurvey(surveyJSON) {
             Survey.surveyLocalization.currentLocale = 'ar';
             state.survey = new Survey.Model(surveyJSON);
-            state.survey.onComplete.add(function(sender) { submitExam(sender.data); });
+
+            state.survey.onComplete.add(function(sender) {
+                submitExam(sender.data);
+            });
+
             DOM.surveyContainer.appendChild(state.survey.render());
         }
 
+        // ===== Timer =====
         function startTimer() {
             updateTimerDisplay();
+            
             state.timerInterval = setInterval(function() {
                 const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
                 const remaining = Math.max(0, state.timeLimit - elapsed);
+
                 updateTimerDisplay(remaining);
                 updateTimerProgress(remaining);
-                if (remaining <= 60) DOM.timerContainer.classList.add('timer-warning');
+
+                if (remaining <= 60) {
+                    DOM.timerContainer.classList.add('timer-warning');
+                }
+
                 if (remaining <= 0) {
                     clearInterval(state.timerInterval);
                     state.timerInterval = null;
-                    if (state.survey) state.survey.completeLastPage();
+                    if (state.survey) {
+                        state.survey.completeLastPage();
+                    }
                 }
             }, 1000);
         }
 
         function updateTimerDisplay(remaining) {
-            if (typeof remaining === 'undefined') remaining = state.timeLimit;
+            if (typeof remaining === 'undefined') {
+                remaining = state.timeLimit;
+            }
             const mins = Math.floor(remaining / 60);
             const secs = remaining % 60;
             DOM.timerDisplay.textContent = mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
@@ -472,8 +724,13 @@
             DOM.timerProgress.style.strokeDashoffset = offset;
         }
 
+        // ===== Submit =====
         async function submitExam(answers) {
-            if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+
             DOM.surveyWrapper.classList.add('hidden');
             DOM.timerWrapper.classList.add('hidden');
             DOM.submittingState.classList.remove('hidden');
@@ -486,20 +743,24 @@
                         exam: state.examId,
                         token: state.examToken,
                         answers: answers,
-                        finishedAt: new Date().toISOString(),
-                        studentName: state.studentName,    // Send Name
-                        studentEmail: state.studentEmail   // Send Email
+                        finishedAt: new Date().toISOString()
                     })
                 });
-                if (!response.ok) throw new Error('خطأ في إرسال الإجابات');
+
+                if (!response.ok) {
+                    throw new Error('خطأ في إرسال الإجابات');
+                }
+
                 const result = await response.json();
                 showSuccess(result);
+
             } catch (error) {
                 console.error('Submit Error:', error);
                 showSuccess({ score: 0, max: 0 });
             }
         }
 
+        // ===== UI States =====
         function showError(title, message) {
             DOM.loadingState.classList.add('hidden');
             DOM.errorState.classList.remove('hidden');
@@ -510,6 +771,7 @@
         function showSuccess(result) {
             DOM.submittingState.classList.add('hidden');
             DOM.successState.classList.remove('hidden');
+
             const score = result.score || 0;
             const max = result.max || 100;
             const percentage = max > 0 ? Math.round((score / max) * 100) : 0;
@@ -523,13 +785,13 @@
                 resultIcon.innerHTML = '<i class="fas fa-trophy text-4xl" style="color: #f59e0b;"></i>';
                 resultIcon.style.background = 'rgba(245, 158, 11, 0.15)';
                 resultTitle.textContent = 'ممتاز!';
-                resultMessage.textContent = 'أداء رائع!';
-                if (typeof confetti !== 'undefined') confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#2563eb', '#059669', '#f59e0b'] });
+                resultMessage.textContent = 'أداء رائع! أنت متقدم في بايثون';
+                celebrateSuccess();
             } else if (percentage >= 60) {
                 resultIcon.innerHTML = '<i class="fas fa-thumbs-up text-4xl" style="color: var(--success);"></i>';
                 resultIcon.style.background = 'rgba(5, 150, 105, 0.15)';
                 resultTitle.textContent = 'جيد!';
-                resultMessage.textContent = 'استمر في التعلم';
+                resultMessage.textContent = 'أداء جيد! استمر في التعلم';
             } else {
                 resultIcon.innerHTML = '<i class="fas fa-book text-4xl" style="color: var(--text-secondary);"></i>';
                 resultIcon.style.background = 'var(--bg-tertiary)';
@@ -550,6 +812,17 @@
                     circleProgress.style.strokeDashoffset = offset;
                 }
             }, 100);
+        }
+
+        function celebrateSuccess() {
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 },
+                    colors: ['#2563eb', '#059669', '#f59e0b']
+                });
+            }
         }
     </script>
 </body>
