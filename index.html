@@ -60,7 +60,7 @@
       document.getElementById('studentForm').style.display = 'none';
     }
 
-   async function startExam() {
+ async function startExam() {
   const name = document.getElementById('studentName').value.trim();
   const email = document.getElementById('studentEmail').value.trim();
 
@@ -69,33 +69,36 @@
     return;
   }
 
+  // 1. إخفاء النموذج وإظهار رسالة التحميل
   document.getElementById('studentForm').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
 
   try {
     const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-    
     const response = await fetch(fetchUrl);
-    const surveyData = await response.json();
+    
+    if (!response.ok) throw new Error("فشل الاتصال بـ n8n");
 
-    // إخفاء رسالة التحميل
+    const surveyData = await response.json();
+    console.log("تم استلام البيانات، جاري الرسم...", surveyData);
+
+    // 2. إخفاء رسالة التحميل تماماً
     document.getElementById('loading').style.display = 'none';
 
-    // 1. إنشاء نموذج الاختبار بالبيانات المستلمة
+    // 3. تهيئة نموذج الاختبار وضبط الإعدادات
     const survey = new Survey.Model(surveyData);
-
-    // 2. ضبط اللغة للعربية لضمان ظهور الأزرار بشكل صحيح
+    
+    // ضبط اللغة للعربية لضمان توافق الاتجاهات والأزرار
     survey.locale = "ar";
 
-    // 3. إضافة تنسيق CSS لضمان ظهور الحاوية
+    // 4. التأكد من أن حاوية الرسم (Container) ظاهرة ولها مساحة
     const container = document.getElementById("surveyContainer");
-    container.style.minHeight = "600px";
+    container.innerHTML = ""; // تنظيف أي محتوى قديم
     container.style.display = "block";
+    container.style.minHeight = "600px"; // ضمان وجود مساحة للرؤية
 
-    // 4. رسم الاختبار داخل الحاوية
+    // 5. الأمر النهائي للرسم
     survey.render("surveyContainer");
-
-    console.log("تم رسم الاختبار بنجاح على الشاشة");
 
     // إرسال النتائج عند الانتهاء
     survey.onComplete.add(async (sender) => {
@@ -107,7 +110,6 @@
             answers: sender.data,
             finishedAt: new Date().toISOString()
         };
-
         fetch(POST_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -117,19 +119,10 @@
 
   } catch (err) {
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('error').textContent = "حدث خطأ أثناء عرض الأسئلة.";
+    document.getElementById('error').textContent = "حدث خطأ أثناء تشغيل الاختبار: " + err.message;
     document.getElementById('error').style.display = 'block';
-    console.error("Error details:", err);
   }
 }
-
-      } catch (err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').innerHTML = `فشل تحميل الاختبار.<br><small>${err.message}</small>`;
-        document.getElementById('error').style.display = 'block';
-        console.error(err);
-      }
-    }
   </script>
 </body>
 </html>
