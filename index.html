@@ -10,10 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- SurveyJS -->
-    <script src="https://unpkg.com/survey-core@2.5.10/survey.core.min.js"></script>
-    <script src="https://unpkg.com/survey-core@2.5.10/survey.i18n.min.js"></script>
-    <link href="https://unpkg.com/survey-core@2.5.10/defaultV2.min.css" rel="stylesheet" type="text/css" />
+    <!-- SurveyJS - إصدار ثابت ومستقر -->
+    <script src="https://unpkg.com/survey-core@1.9.139/survey.core.min.js"></script>
+    <link href="https://unpkg.com/survey-core@1.9.139/defaultV2.min.css" rel="stylesheet" type="text/css" />
     
     <style>
         /* ========== المتغيرات الأساسية ========== */
@@ -43,13 +42,11 @@
             --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             --radius: 16px;
             --radius-sm: 8px;
             --radius-lg: 24px;
         }
 
-        /* ========== إعادة تعيين الأنماط الأساسية ========== */
         * {
             margin: 0;
             padding: 0;
@@ -64,7 +61,6 @@
             line-height: 1.7;
         }
 
-        /* ========== الحاوية الرئيسية ========== */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -75,7 +71,6 @@
             justify-content: center;
         }
 
-        /* ========== الشعار والأيقونة ========== */
         .app-header {
             position: fixed;
             top: 0;
@@ -124,7 +119,6 @@
             color: var(--text-muted);
         }
 
-        /* ========== البطاقات ========== */
         .card {
             background: var(--card);
             border-radius: var(--radius);
@@ -187,7 +181,6 @@
             padding: 32px;
         }
 
-        /* ========== حالات التحميل ========== */
         .loading-screen, .error-screen {
             text-align: center;
             padding: 60px 30px;
@@ -223,7 +216,6 @@
             font-weight: 500;
         }
 
-        /* ========== رسائل الخطأ ========== */
         .error-icon {
             width: 80px;
             height: 80px;
@@ -254,7 +246,6 @@
             font-size: 0.95rem;
         }
 
-        /* ========== شاشة التسجيل ========== */
         .registration-form {
             max-width: 400px;
             margin: 0 auto;
@@ -307,7 +298,6 @@
             color: var(--text-muted);
         }
 
-        /* ========== شارات المعلومات ========== */
         .info-badges {
             display: flex;
             flex-wrap: wrap;
@@ -335,7 +325,6 @@
             color: var(--primary);
         }
 
-        /* ========== الأزرار ========== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -393,14 +382,12 @@
             background: var(--primary-bg);
         }
 
-        /* ========== الفاصل ========== */
         .divider {
             height: 1px;
             background: var(--border);
             margin: 28px 0;
         }
 
-        /* ========== شريط الوقت ========== */
         .timer-bar {
             position: fixed;
             top: 77px;
@@ -481,7 +468,6 @@
             background: linear-gradient(90deg, var(--error) 0%, #f87171 100%);
         }
 
-        /* ========== حاوية الامتحان ========== */
         .exam-container {
             padding-top: 160px;
             padding-bottom: 40px;
@@ -491,7 +477,6 @@
             padding-top: 100px;
         }
 
-        /* ========== شاشة النتائج ========== */
         .result-header {
             padding: 48px;
             text-align: center;
@@ -535,7 +520,6 @@
             font-size: 1.1rem;
         }
 
-        /* ========== إحصائيات النتيجة ========== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -573,7 +557,6 @@
             font-weight: 500;
         }
 
-        /* ========== تفاصيل الأسئلة ========== */
         .questions-details {
             padding: 0 28px 28px;
         }
@@ -702,7 +685,6 @@
             height: 16px;
         }
 
-        /* ========== معلومات التسليم ========== */
         .submission-info {
             text-align: center;
             padding: 20px;
@@ -718,7 +700,6 @@
             margin: 4px 0;
         }
 
-        /* ========== أزرار الإجراءات ========== */
         .action-buttons {
             display: flex;
             gap: 12px;
@@ -752,17 +733,17 @@
             }
         }
 
-        /* ========== تخصيص SurveyJS ========== */
-        .sd-root-modern {
+        /* تخصيص SurveyJS */
+        .sv_main.sv_default_css {
             direction: rtl !important;
             font-family: 'Cairo', sans-serif !important;
         }
 
-        .sd-container-modern {
+        .sv_container {
             direction: rtl !important;
         }
 
-        .sd-title {
+        .sv_title {
             font-size: 1.5rem !important;
             font-weight: 700 !important;
             text-align: center !important;
@@ -770,17 +751,17 @@
             color: var(--text) !important;
         }
 
-        .sd-description {
+        .sv_description {
             text-align: center !important;
             color: var(--text-muted) !important;
             font-size: 1rem !important;
         }
 
-        .sd-page {
+        .sv_p_root {
             padding: 1.5rem !important;
         }
 
-        .sd-question {
+        .sv_q {
             padding: 1.25rem !important;
             margin-bottom: 1rem !important;
             border-radius: var(--radius-sm) !important;
@@ -788,7 +769,7 @@
             border: 1px solid var(--border) !important;
         }
 
-        .sd-question__title {
+        .sv_q_title {
             font-size: 1.05rem !important;
             font-weight: 600 !important;
             color: var(--text) !important;
@@ -796,12 +777,12 @@
             font-family: 'Cairo', sans-serif !important;
         }
 
-        .sd-question__description {
+        .sv_q_description {
             color: var(--text-muted) !important;
             font-size: 0.9rem !important;
         }
 
-        .sd-item {
+        .sv_item {
             direction: rtl !important;
             text-align: right !important;
             padding: 12px 14px !important;
@@ -810,31 +791,23 @@
             transition: all 0.2s !important;
         }
 
-        .sd-item--allowhover:hover {
+        .sv_item:hover {
             background: var(--primary-bg) !important;
         }
 
-        .sd-radio__decorator,
-        .sd-checkbox__decorator {
+        .sv_q_radiogroup_control_item,
+        .sv_q_checkbox_control_item {
             margin-left: 12px !important;
             margin-right: 0 !important;
-            border-color: var(--border) !important;
-            width: 22px !important;
-            height: 22px !important;
         }
 
-        .sd-item--checked .sd-radio__decorator,
-        .sd-item--checked .sd-checkbox__decorator {
-            border-color: var(--primary) !important;
-            background: var(--primary) !important;
-        }
-
-        .sd-item__caption {
+        .sv_q_radiogroup_label,
+        .sv_q_checkbox_label {
             font-family: 'Cairo', sans-serif !important;
             font-size: 1rem !important;
         }
 
-        .sd-btn {
+        .sv_btn {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
             color: white !important;
             border: none !important;
@@ -846,35 +819,29 @@
             box-shadow: var(--shadow-md) !important;
         }
 
-        .sd-btn:hover {
+        .sv_btn:hover {
             transform: translateY(-2px) !important;
             box-shadow: var(--shadow-lg) !important;
         }
 
-        .sd-navigation {
+        .sv_nav {
             direction: rtl !important;
             margin-top: 1.5rem !important;
             padding-top: 1.5rem !important;
             border-top: 1px solid var(--border) !important;
         }
 
-        .sd-progress-bar {
+        .sv_progress {
             background: var(--border) !important;
             border-radius: 4px !important;
             height: 8px !important;
         }
 
-        .sd-progress-bar__progress {
+        .sv_progress_bar {
             background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%) !important;
             border-radius: 4px !important;
         }
 
-        .sd-progress-bar__text {
-            font-family: 'Cairo', sans-serif !important;
-            color: var(--text-muted) !important;
-        }
-
-        /* ========== تراكب التقديم ========== */
         .submit-overlay {
             position: fixed;
             inset: 0;
@@ -895,7 +862,6 @@
             padding: 40px;
         }
 
-        /* ========== حالة فارغة ========== */
         .empty-state {
             text-align: center;
             padding: 60px 30px;
@@ -942,6 +908,34 @@
             color: var(--text-secondary);
             word-break: break-all;
         }
+
+        /* ميزات منع الغش - تحذير */
+        .cheating-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(220, 38, 38, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .cheating-warning h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .cheating-warning p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
@@ -967,11 +961,9 @@
     <script>
         // ========== إعدادات n8n ==========
         const N8N_CONFIG = {
-            // رابط n8n الخاص بك
             BASE_URL: 'https://n8n.srv1332143.hstgr.cloud/webhook'
         };
 
-        // استخراج الروابط من الإعدادات
         function getGetSurveyUrl() {
             return `${N8N_CONFIG.BASE_URL}/get-survey`;
         }
@@ -985,44 +977,32 @@
             title: 'اختبار تجريبي في البرمجة',
             description: 'هذا اختبار تجريبي لاختبار النظام',
             showProgressBar: 'top',
-            showTimerPanel: 'top',
             maxTimeToFinish: 600,
             pages: [{
                 elements: [
                     {
                         type: 'radiogroup',
-                        name: 'question_1',
+                        name: 'q_1',
                         title: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب؟',
                         choices: ['Python', 'JavaScript', 'Java', 'C++'],
-                        correctAnswer: 'JavaScript'
+                        correctAnswer: 'JavaScript',
+                        isRequired: true
                     },
                     {
                         type: 'radiogroup',
-                        name: 'question_2',
+                        name: 'q_2',
                         title: 'ما هو ناتج: 2 + 2 * 3؟',
                         choices: ['8', '12', '6', '10'],
-                        correctAnswer: '8'
+                        correctAnswer: '8',
+                        isRequired: true
                     },
                     {
                         type: 'checkbox',
-                        name: 'question_3',
+                        name: 'q_3',
                         title: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)',
                         choices: ['HTML', 'Python', 'CSS', 'JavaScript', 'SQL'],
-                        correctAnswer: ['Python', 'JavaScript', 'SQL']
-                    },
-                    {
-                        type: 'radiogroup',
-                        name: 'question_4',
-                        title: 'ما هي بنية البيانات التي تتبع مبدأ FIFO؟',
-                        choices: ['Stack', 'Queue', 'Tree', 'Graph'],
-                        correctAnswer: 'Queue'
-                    },
-                    {
-                        type: 'radiogroup',
-                        name: 'question_5',
-                        title: 'ما هو الأمر لطباعة "Hello" في Python؟',
-                        choices: ['echo "Hello"', 'print("Hello")', 'console.log("Hello")', 'printf("Hello")'],
-                        correctAnswer: 'print("Hello")'
+                        correctAnswer: ['Python', 'JavaScript', 'SQL'],
+                        isRequired: true
                     }
                 ]
             }]
@@ -1031,9 +1011,7 @@
         const DEMO_CORRECT_ANSWERS = {
             'q_1': { answer: 'JavaScript', points: 1, question: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب؟' },
             'q_2': { answer: '8', points: 1, question: 'ما هو ناتج: 2 + 2 * 3؟' },
-            'q_3': { answer: ['Python', 'JavaScript', 'SQL'], points: 2, question: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)' },
-            'q_4': { answer: 'Queue', points: 1, question: 'ما هي بنية البيانات التي تتبع مبدأ FIFO؟' },
-            'q_5': { answer: 'print("Hello")', points: 1, question: 'ما هو الأمر لطباعة "Hello" في Python؟' }
+            'q_3': { answer: ['Python', 'JavaScript', 'SQL'], points: 2, question: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)' }
         };
 
         // ========== حالة التطبيق ==========
@@ -1050,7 +1028,9 @@
             currentView: 'loading',
             error: null,
             result: null,
-            submitting: false
+            submitting: false,
+            cheatingAttempts: 0,
+            examStarted: false
         };
 
         // ========== أيقونات SVG ==========
@@ -1058,12 +1038,11 @@
             clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
             fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
             user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+            mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
             checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
             xCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
             alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
-            award: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
             edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
-            mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
             printer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`,
             refreshCw: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
             hash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>`
@@ -1094,6 +1073,109 @@
             });
         }
 
+        // ========== ميزات منع الغش ==========
+        function initAntiCheating() {
+            // منع Right Click
+            document.addEventListener('contextmenu', function(e) {
+                if (appState.examStarted) {
+                    e.preventDefault();
+                    handleCheatingAttempt('right_click');
+                    return false;
+                }
+            });
+
+            // منع F12 و Ctrl+Shift+I و Ctrl+U
+            document.addEventListener('keydown', function(e) {
+                if (!appState.examStarted) return;
+                
+                // F12
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                    handleCheatingAttempt('f12');
+                    return false;
+                }
+                
+                // Ctrl+Shift+I (DevTools)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
+                    e.preventDefault();
+                    handleCheatingAttempt('devtools');
+                    return false;
+                }
+                
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+                    e.preventDefault();
+                    handleCheatingAttempt('view_source');
+                    return false;
+                }
+                
+                // Ctrl+C (Copy)
+                if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+                    e.preventDefault();
+                    handleCheatingAttempt('copy');
+                    return false;
+                }
+                
+                // Ctrl+V (Paste)
+                if (e.ctrlKey && (e.key === 'v' || e.key === 'V')) {
+                    e.preventDefault();
+                    handleCheatingAttempt('paste');
+                    return false;
+                }
+            });
+
+            // كشف مغادرة النافذة
+            document.addEventListener('visibilitychange', function() {
+                if (appState.examStarted && document.hidden) {
+                    handleCheatingAttempt('tab_switch');
+                }
+            });
+
+            // كشف فقدان التركيز
+            window.addEventListener('blur', function() {
+                if (appState.examStarted) {
+                    handleCheatingAttempt('window_blur');
+                }
+            });
+
+            // تحذير قبل مغادرة الصفحة
+            window.addEventListener('beforeunload', function(e) {
+                if (appState.examStarted && !appState.submitting) {
+                    e.preventDefault();
+                    e.returnValue = 'هل أنت متأكد من مغادرة الامتحان؟ سيتم إلغاؤه!';
+                    return e.returnValue;
+                }
+            });
+        }
+
+        function handleCheatingAttempt(type) {
+            appState.cheatingAttempts++;
+            console.warn(`محاولة غش #${appState.cheatingAttempts}: ${type}`);
+            
+            // بعد 3 محاولات، ننهي الامتحان
+            if (appState.cheatingAttempts >= 3) {
+                showCheatingWarning();
+                if (appState.survey) {
+                    setTimeout(() => {
+                        appState.survey.completeLastPage();
+                    }, 2000);
+                }
+            } else {
+                alert(`⚠️ تحذير: تم اكتشاف محاولة غش (${appState.cheatingAttempts}/3)\n\nنوع المحاولة: ${type}\n\nبعد 3 محاولات سيتم إنهاء الامتحان تلقائياً!`);
+            }
+        }
+
+        function showCheatingWarning() {
+            const warning = document.createElement('div');
+            warning.className = 'cheating-warning';
+            warning.innerHTML = `
+                <h2>⛔ تم إنهاء الامتحان</h2>
+                <p>تم اكتشاف محاولات غش متعددة (3/3)</p>
+                <p>سيتم تسجيل الإجابات الحالية وإنهاء الامتحان</p>
+            `;
+            document.body.appendChild(warning);
+        }
+
         // ========== عرض الواجهات ==========
         function render() {
             const app = document.getElementById('app');
@@ -1113,7 +1195,8 @@
                     break;
                 case 'exam':
                     app.innerHTML = renderExam();
-                    initSurvey();
+                    // تأخير بسيط لضمان تحميل DOM
+                    setTimeout(initSurvey, 100);
                     break;
                 case 'result':
                     app.innerHTML = renderResult();
@@ -1191,6 +1274,10 @@
 
         function renderRegistration() {
             const surveyData = appState.surveyData;
+            const questionCount = surveyData.pages && surveyData.pages[0] && surveyData.pages[0].elements 
+                ? surveyData.pages[0].elements.length 
+                : 0;
+            
             return `
                 <div class="container">
                     <div class="card">
@@ -1211,7 +1298,7 @@
                                 ` : ''}
                                 <span class="badge">
                                     ${icons.fileText}
-                                    ${surveyData.pages[0]?.elements.length || 0} سؤال
+                                    ${questionCount} سؤال
                                 </span>
                             </div>
                             
@@ -1383,6 +1470,7 @@
                         <div class="submission-info">
                             <p><strong>معرف التسليم:</strong> ${result.submissionId}</p>
                             <p><strong>تاريخ التسليم:</strong> ${formatDate(result.submittedAt)}</p>
+                            ${appState.cheatingAttempts > 0 ? `<p style="color: var(--error);"><strong>⚠️ محاولات غش:</strong> ${appState.cheatingAttempts}</p>` : ''}
                         </div>
                         
                         <div class="action-buttons">
@@ -1402,30 +1490,58 @@
 
         // ========== تهيئة SurveyJS ==========
         function initSurvey() {
-            const survey = new Survey.Model(appState.surveyData);
-            survey.locale = 'ar';
-            
-            survey.onComplete.add(async (sender) => {
-                const plainData = sender.getPlainData();
-                const answers = {};
+            try {
+                const container = document.getElementById('surveyContainer');
+                if (!container) {
+                    console.error('Survey container not found');
+                    return;
+                }
+
+                // إنشاء نموذج SurveyJS
+                const survey = new Survey.Model(appState.surveyData);
                 
-                plainData.forEach(question => {
-                    if (question.value !== null && question.value !== undefined) {
-                        const qId = question.name.replace('question_', 'q_');
-                        answers[qId] = question.value;
+                // تعيين اللغة العربية
+                survey.locale = 'ar';
+                
+                // إخفاء عنوان الصفحة (نستخدم تصميمنا الخاص)
+                survey.showTitle = false;
+                
+                // عند اكتمال الامتحان
+                survey.onComplete.add(async function(sender) {
+                    const data = sender.data;
+                    const answers = {};
+                    
+                    // تحويل البيانات إلى التنسيق المطلوب
+                    for (let key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            answers[key] = data[key];
+                        }
                     }
+                    
+                    await submitExam(answers);
                 });
                 
-                await submitExam(answers);
-            });
-            
-            appState.survey = survey;
-            
-            if (appState.timeRemaining > 0) {
-                startTimer();
+                // حفظ المرجع
+                appState.survey = survey;
+                
+                // تفعيل ميزات منع الغش
+                appState.examStarted = true;
+                initAntiCheating();
+                
+                // بدء المؤقت
+                if (appState.timeRemaining > 0) {
+                    startTimer();
+                }
+                
+                // عرض الاستبيان
+                survey.render(container);
+                
+            } catch (error) {
+                console.error('Error initializing survey:', error);
+                appState.error = 'فشل في تحميل الأسئلة: ' + error.message;
+                appState.currentView = 'error';
+                render();
             }
-            
-            survey.render('surveyContainer');
         }
 
         // ========== المؤقت ==========
@@ -1485,7 +1601,6 @@
         async function fetchSurvey() {
             const params = getQueryParams();
             
-            // إذا لم يتم تحديد معرف امتحان
             if (!params.examId || !params.token) {
                 appState.currentView = 'empty';
                 render();
@@ -1519,6 +1634,12 @@
                 }
                 
                 const data = await response.json();
+                
+                // التأكد من صحة البيانات
+                if (!data.pages || !data.pages[0] || !data.pages[0].elements) {
+                    throw new Error('بيانات الامتحان غير مكتملة');
+                }
+                
                 appState.surveyData = data;
                 appState.currentView = 'registration';
                 render();
@@ -1553,7 +1674,7 @@
             appState.startTime = Date.now();
             
             if (appState.surveyData.maxTimeToFinish) {
-                appState.timeRemaining = appState.surveyData.maxTimeToFinish;
+                appState.timeRemaining = parseInt(appState.surveyData.maxTimeToFinish);
             }
             
             appState.currentView = 'exam';
@@ -1563,6 +1684,7 @@
         // ========== تقديم الامتحان ==========
         async function submitExam(answers) {
             appState.submitting = true;
+            appState.examStarted = false; // إيقاف ميزات منع الغش
             render();
             
             const timeSpent = Math.floor((Date.now() - appState.startTime) / 1000);
@@ -1574,7 +1696,8 @@
                 studentName: appState.studentName,
                 studentEmail: appState.studentEmail || null,
                 timeSpent: timeSpent,
-                finishedAt: new Date().toISOString()
+                finishedAt: new Date().toISOString(),
+                cheatingAttempts: appState.cheatingAttempts
             };
             
             // الوضع التجريبي
