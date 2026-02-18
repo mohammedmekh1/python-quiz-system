@@ -60,53 +60,68 @@
       document.getElementById('studentForm').style.display = 'none';
     }
 
-    async function startExam() {
-      const name = document.getElementById('studentName').value.trim();
-      const email = document.getElementById('studentEmail').value.trim();
+   async function startExam() {
+  const name = document.getElementById('studentName').value.trim();
+  const email = document.getElementById('studentEmail').value.trim();
 
-      if (!name || !email.includes('@')) {
-        alert('يرجى إدخال اسمك والبريد الإلكتروني بشكل صحيح');
-        return;
-      }
+  if (!name || !email.includes('@')) {
+    alert('يرجى إدخال اسمك والبريد الإلكتروني بشكل صحيح');
+    return;
+  }
 
-      document.getElementById('studentForm').style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
+  document.getElementById('studentForm').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
 
-      try {
-        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-        
-        console.log("جاري طلب البيانات من:", fetchUrl);
+  try {
+    const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    
+    const response = await fetch(fetchUrl);
+    const surveyData = await response.json();
 
-        const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error(`خطأ 403: تأكد من التوكن أو تفعيل Webhook في n8n`);
-        
-        const surveyData = await response.json();
-        console.log("البيانات المستلمة:", surveyData);
+    // إخفاء رسالة التحميل
+    document.getElementById('loading').style.display = 'none';
 
-        document.getElementById('loading').style.display = 'none';
+    // 1. إنشاء نموذج الاختبار بالبيانات المستلمة
+    const survey = new Survey.Model(surveyData);
 
-        // تهيئة ورسم الاختبار
-        const survey = new Survey.Model(surveyData);
-        
-        // عند الانتهاء
-        survey.onComplete.add(async (sender) => {
-            const results = {
-                exam: examId,
-                token: token,
-                studentName: name,
-                studentEmail: email,
-                answers: sender.data,
-                finishedAt: new Date().toISOString()
-            };
+    // 2. ضبط اللغة للعربية لضمان ظهور الأزرار بشكل صحيح
+    survey.locale = "ar";
 
-            fetch(POST_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(results)
-            }).catch(err => console.error("فشل إرسال النتائج:", err));
+    // 3. إضافة تنسيق CSS لضمان ظهور الحاوية
+    const container = document.getElementById("surveyContainer");
+    container.style.minHeight = "600px";
+    container.style.display = "block";
+
+    // 4. رسم الاختبار داخل الحاوية
+    survey.render("surveyContainer");
+
+    console.log("تم رسم الاختبار بنجاح على الشاشة");
+
+    // إرسال النتائج عند الانتهاء
+    survey.onComplete.add(async (sender) => {
+        const results = {
+            exam: examId,
+            token: token,
+            studentName: name,
+            studentEmail: email,
+            answers: sender.data,
+            finishedAt: new Date().toISOString()
+        };
+
+        fetch(POST_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(results)
         });
+    });
 
-        survey.render("surveyContainer");
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').textContent = "حدث خطأ أثناء عرض الأسئلة.";
+    document.getElementById('error').style.display = 'block';
+    console.error("Error details:", err);
+  }
+}
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
