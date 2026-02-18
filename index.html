@@ -19,6 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        /* نفس التنسيقات السابقة */
         :root {
             --bg-primary: #f5f7fa;
             --bg-secondary: #ffffff;
@@ -63,17 +64,42 @@
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         
-        .input-field { width: 100%; padding: 12px 16px; background: var(--bg-tertiary); border: 2px solid var(--border); border-radius: 10px; color: var(--text-primary); font-family: 'Cairo', sans-serif; font-size: 1rem; transition: all 0.2s ease; }
+        /* Form Inputs */
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
         .input-field:focus { outline: none; border-color: var(--accent); background: var(--bg-secondary); }
         .input-field::placeholder { color: var(--text-muted); }
         
-        .btn-primary { background: var(--accent); color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s ease; }
+        /* Buttons */
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
         
-        .theme-toggle { width: 40px; height: 40px; border-radius: 10px; background: var(--bg-tertiary); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+        .theme-toggle {
+            width: 40px; height: 40px; border-radius: 10px; background: var(--bg-tertiary); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+        }
         .theme-toggle:hover { background: var(--accent-light); border-color: var(--accent); }
         .theme-toggle i { color: var(--text-secondary); font-size: 1rem; }
         
+        /* SurveyJS Overrides */
         .sd-root-modern { --primary: var(--accent) !important; --primary-light: var(--accent-light) !important; --background: var(--bg-secondary) !important; --background-dim: var(--bg-tertiary) !important; --foreground: var(--text-primary) !important; --foreground-light: var(--text-secondary) !important; --border: var(--border) !important; --corner-radius: 10px !important; }
         .sd-root-modern .sd-item { background: var(--bg-tertiary) !important; border: 2px solid var(--border) !important; border-radius: 10px !important; padding: 12px 16px !important; margin-bottom: 8px !important; transition: all 0.2s ease !important; }
         .sd-root-modern .sd-item:hover { border-color: var(--accent) !important; }
@@ -86,6 +112,7 @@
         .sd-root-modern .sd-question { padding: 0 !important; }
         .sd-root-modern .sd-selectbase { padding: 0 !important; border: none !important; }
         
+        /* Score Circle */
         .score-circle { position: relative; width: 140px; height: 140px; }
         .score-circle svg { transform: rotate(-90deg); }
         .score-circle-bg { fill: none; stroke: var(--border); stroke-width: 10; }
@@ -102,6 +129,7 @@
 <body class="antialiased">
     <div class="bg-pattern"></div>
 
+    <!-- Header -->
     <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-l-0 border-r-0">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -133,22 +161,9 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="relative z-10 container mx-auto px-4 pt-24 pb-8 min-h-screen">
         
-        <!-- Locked State (New) -->
-        <div id="locked-state" class="hidden">
-            <div class="max-w-lg mx-auto card p-8 text-center fade-in">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(220, 38, 38, 0.1);">
-                    <i class="fas fa-lock text-3xl" style="color: var(--danger);"></i>
-                </div>
-                <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">تم حظر الوصول</h2>
-                <p id="locked-message" class="mb-4" style="color: var(--text-secondary);">
-                    لقد غادرت صفحة الاختبار أو قمت بتحديثها، وبالتالي تم إنهاء الجلسة تلقائياً لمنع الغش.
-                </p>
-                <p class="text-sm" style="color: var(--text-muted);">للاستفسار، يرجى التواصل مع المشرف.</p>
-            </div>
-        </div>
-
         <!-- Loading State -->
         <div id="loading-state" class="flex flex-col items-center justify-center min-h-[70vh]">
             <div class="card p-8 text-center fade-in max-w-md w-full">
@@ -173,18 +188,12 @@
             </div>
         </div>
 
-        <!-- Start Form -->
+        <!-- Start Form (New) -->
         <div id="start-form-state" class="hidden">
             <div class="max-w-lg mx-auto card p-6 fade-in">
                 <div class="text-center mb-6">
                     <h2 id="start-exam-title" class="text-xl font-bold" style="color: var(--text-primary);">عنوان الاختبار</h2>
                     <p id="start-exam-desc" class="text-sm mt-1" style="color: var(--text-secondary);"></p>
-                    
-                    <!-- Warning Message -->
-                    <div class="mt-4 p-3 rounded-lg text-right text-sm" style="background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2);">
-                        <i class="fas fa-exclamation-triangle ml-1"></i>
-                        <strong>تنبيه هام:</strong> بمجرد الضغط على "بدء الاختبار"، لن تتمكن من تحديث الصفحة أو الخروج منها، وسيتم إنهاء الاختبار تلقائياً.
-                    </div>
                 </div>
                 
                 <form id="student-info-form" class="space-y-4">
@@ -296,8 +305,7 @@
         const state = {
             examId: '', examToken: '', timeLimit: 0, startTime: null,
             timerInterval: null, survey: null, examData: null, isDark: false,
-            studentName: '', studentEmail: '',
-            lockKey: '' // Unique key for locking
+            studentName: '', studentEmail: '' // Added student info
         };
 
         const DOM = {
@@ -305,11 +313,10 @@
             loadingMessage: document.getElementById('loading-message'),
             errorState: document.getElementById('error-state'),
             errorMessage: document.getElementById('error-message'),
-            lockedState: document.getElementById('locked-state'), // New
-            startFormState: document.getElementById('start-form-state'),
-            studentInfoForm: document.getElementById('student-info-form'),
-            startExamTitle: document.getElementById('start-exam-title'),
-            startExamDesc: document.getElementById('start-exam-desc'),
+            startFormState: document.getElementById('start-form-state'), // New
+            studentInfoForm: document.getElementById('student-info-form'), // New
+            startExamTitle: document.getElementById('start-exam-title'), // New
+            startExamDesc: document.getElementById('start-exam-desc'), // New
             surveyWrapper: document.getElementById('survey-wrapper'),
             surveyContainer: document.getElementById('surveyContainer'),
             submittingState: document.getElementById('submitting-state'),
@@ -364,16 +371,6 @@
             }
             state.examId = params.examId;
             state.examToken = params.examToken;
-            
-            // Set unique lock key based on token
-            state.lockKey = 'quiz_lock_' + state.examToken;
-
-            // Check if exam is already locked (Anti-Cheat Check)
-            if (localStorage.getItem(state.lockKey)) {
-                showLockedState();
-                return;
-            }
-
             await loadSurveyData();
         }
 
@@ -391,13 +388,14 @@
                 if (data.error || data.success === false) throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
                 
                 state.examData = data;
-                showStartForm(data);
+                showStartForm(data); // Show form first instead of starting immediately
             } catch (error) {
                 console.error('Load Error:', error);
                 showError('فشل الاتصال بالخادم', error.message);
             }
         }
 
+        // New function to show start form
         function showStartForm(data) {
             DOM.loadingState.classList.add('hidden');
             DOM.startFormState.classList.remove('hidden');
@@ -408,15 +406,13 @@
             DOM.studentInfoForm.addEventListener('submit', handleStartExam);
         }
 
+        // Handle form submission
         function handleStartExam(e) {
             e.preventDefault();
             state.studentName = document.getElementById('student-name').value.trim();
             state.studentEmail = document.getElementById('student-email').value.trim();
             
             if(!state.studentName || !state.studentEmail) return;
-            
-            // ACTIVATE LOCK (Anti-Cheat)
-            localStorage.setItem(state.lockKey, 'started');
             
             DOM.startFormState.classList.add('hidden');
             initializeExam(state.examData);
@@ -478,10 +474,6 @@
 
         async function submitExam(answers) {
             if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
-            
-            // Clear lock on successful submission
-            localStorage.removeItem(state.lockKey);
-            
             DOM.surveyWrapper.classList.add('hidden');
             DOM.timerWrapper.classList.add('hidden');
             DOM.submittingState.classList.remove('hidden');
@@ -495,8 +487,8 @@
                         token: state.examToken,
                         answers: answers,
                         finishedAt: new Date().toISOString(),
-                        studentName: state.studentName,
-                        studentEmail: state.studentEmail
+                        studentName: state.studentName,    // Send Name
+                        studentEmail: state.studentEmail   // Send Email
                     })
                 });
                 if (!response.ok) throw new Error('خطأ في إرسال الإجابات');
@@ -513,11 +505,6 @@
             DOM.errorState.classList.remove('hidden');
             document.querySelector('#error-state h2').textContent = title;
             DOM.errorMessage.textContent = message;
-        }
-        
-        function showLockedState() {
-            DOM.loadingState.classList.add('hidden');
-            DOM.lockedState.classList.remove('hidden');
         }
 
         function showSuccess(result) {
