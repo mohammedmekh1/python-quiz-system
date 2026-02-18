@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام الامتحانات الإلكترونية</title>
     
+    <!-- Google Fonts - Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- SurveyJS -->
     <script src="https://unpkg.com/survey-core@2.5.10/survey.core.min.js"></script>
     <script src="https://unpkg.com/survey-core@2.5.10/survey.i18n.min.js"></script>
@@ -13,23 +18,35 @@
     <style>
         /* ========== المتغيرات الأساسية ========== */
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --success: #22c55e;
-            --success-light: #dcfce7;
-            --error: #ef4444;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --success: #059669;
+            --success-light: #ecfdf5;
+            --success-border: #a7f3d0;
+            --error: #dc2626;
             --error-light: #fef2f2;
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --background: #f8fafc;
+            --error-border: #fecaca;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --warning-border: #fde68a;
+            --background: #ffffff;
+            --background-secondary: #f9fafb;
             --card: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --text: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius: 12px;
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-lg: 24px;
         }
 
         /* ========== إعادة تعيين الأنماط الأساسية ========== */
@@ -40,22 +57,71 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            background: var(--background);
             min-height: 100vh;
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         /* ========== الحاوية الرئيسية ========== */
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* ========== الشعار والأيقونة ========== */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 16px 24px;
+        }
+
+        .app-header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .app-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .app-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         /* ========== البطاقات ========== */
@@ -63,15 +129,16 @@
             background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
             overflow: hidden;
             width: 100%;
-            animation: slideUp 0.5s ease-out;
+            animation: fadeInUp 0.4s ease-out;
         }
 
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -80,40 +147,70 @@
         }
 
         .card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 30px;
+            background: var(--background-secondary);
+            padding: 32px;
             text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header-icon svg {
+            width: 36px;
+            height: 36px;
+            color: white;
         }
 
         .card-header h1 {
             font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
             margin-bottom: 8px;
         }
 
         .card-header p {
-            opacity: 0.9;
+            color: var(--text-muted);
             font-size: 1rem;
         }
 
         .card-body {
-            padding: 30px;
+            padding: 32px;
         }
 
         /* ========== حالات التحميل ========== */
-        .loading-screen, .error-screen, .result-screen {
+        .loading-screen, .error-screen {
             text-align: center;
             padding: 60px 30px;
         }
 
+        .loading-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
         .spinner {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             border: 4px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -121,8 +218,9 @@
         }
 
         .loading-text {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 1.1rem;
+            font-weight: 500;
         }
 
         /* ========== رسائل الخطأ ========== */
@@ -145,13 +243,15 @@
 
         .error-title {
             font-size: 1.5rem;
+            font-weight: 700;
             color: var(--error);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .error-message {
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
         }
 
         /* ========== شاشة التسجيل ========== */
@@ -161,35 +261,46 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-label {
-            display: block;
-            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: var(--text);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
 
         .form-label .required {
             color: var(--error);
         }
 
+        .form-label svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+        }
+
         .form-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px 18px;
             border: 2px solid var(--border);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 1rem;
-            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
             direction: rtl;
             text-align: right;
+            background: var(--background);
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px var(--primary-bg);
         }
 
         .form-input::placeholder {
@@ -202,23 +313,26 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 10px 16px;
-            background: var(--background);
-            border-radius: 20px;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--background-secondary);
+            border-radius: 50px;
             font-size: 0.9rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-weight: 500;
         }
 
         .badge svg {
             width: 18px;
             height: 18px;
+            color: var(--primary);
         }
 
         /* ========== الأزرار ========== */
@@ -226,14 +340,15 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
+            gap: 10px;
+            padding: 14px 32px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 1rem;
             font-weight: 600;
+            font-family: 'Cairo', sans-serif;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-decoration: none;
         }
 
@@ -241,11 +356,16 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             width: 100%;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .btn-primary:disabled {
@@ -254,36 +374,46 @@
         }
 
         .btn-secondary {
-            background: var(--background);
-            color: var(--text);
+            background: var(--background-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background: var(--border);
+            background: var(--border-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-bg);
         }
 
         /* ========== الفاصل ========== */
         .divider {
             height: 1px;
             background: var(--border);
-            margin: 24px 0;
+            margin: 28px 0;
         }
 
         /* ========== شريط الوقت ========== */
         .timer-bar {
             position: fixed;
-            top: 0;
+            top: 77px;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 12px 20px;
-            z-index: 1000;
-            box-shadow: var(--shadow);
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            z-index: 90;
         }
 
         .timer-content {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -293,80 +423,100 @@
         .timer-label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 500;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .timer-label svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
         }
 
         .timer-value {
             font-size: 1.75rem;
-            font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            font-family: 'Cairo', monospace;
+            color: var(--text);
+            min-width: 80px;
+            text-align: center;
         }
 
         .timer-value.warning {
-            color: #fbbf24;
+            color: var(--warning);
             animation: pulse 1s infinite;
         }
 
         .timer-value.danger {
-            color: #fca5a5;
+            color: var(--error);
             animation: pulse 0.5s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.6; }
         }
 
         .timer-progress {
             height: 4px;
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--border);
             border-radius: 2px;
-            margin-top: 8px;
+            margin-top: 12px;
             overflow: hidden;
         }
 
         .timer-progress-bar {
             height: 100%;
-            background: white;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
             border-radius: 2px;
             transition: width 1s linear;
         }
 
+        .timer-progress-bar.warning {
+            background: linear-gradient(90deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .timer-progress-bar.danger {
+            background: linear-gradient(90deg, var(--error) 0%, #f87171 100%);
+        }
+
         /* ========== حاوية الامتحان ========== */
         .exam-container {
-            padding-top: 100px;
+            padding-top: 160px;
+            padding-bottom: 40px;
         }
 
         .exam-container.no-timer {
-            padding-top: 20px;
+            padding-top: 100px;
         }
 
         /* ========== شاشة النتائج ========== */
         .result-header {
-            padding: 40px;
+            padding: 48px;
             text-align: center;
         }
 
         .result-header.passed {
-            background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+            background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
             color: white;
         }
 
         .result-header.failed {
-            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
             color: white;
         }
 
         .result-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 88px;
+            height: 88px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
         }
 
         .result-icon svg {
@@ -376,7 +526,7 @@
 
         .result-title {
             font-size: 2rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 8px;
         }
 
@@ -390,7 +540,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 16px;
-            padding: 30px;
+            padding: 28px;
         }
 
         @media (min-width: 640px) {
@@ -400,15 +550,16 @@
         }
 
         .stat-card {
-            background: var(--background);
-            border-radius: 12px;
+            background: var(--background-secondary);
+            border-radius: var(--radius-sm);
             padding: 20px;
             text-align: center;
+            border: 1px solid var(--border);
         }
 
         .stat-value {
             font-size: 2rem;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--primary);
         }
 
@@ -419,60 +570,67 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             margin-top: 4px;
+            font-weight: 500;
         }
 
         /* ========== تفاصيل الأسئلة ========== */
         .questions-details {
-            padding: 0 30px 30px;
+            padding: 0 28px 28px;
         }
 
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            color: var(--text);
         }
 
         .section-title svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             color: var(--primary);
         }
 
         .question-item {
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             padding: 20px;
             margin-bottom: 12px;
             border: 2px solid;
+            transition: all 0.2s;
+        }
+
+        .question-item:hover {
+            transform: translateX(-4px);
         }
 
         .question-item.correct {
             background: var(--success-light);
-            border-color: var(--success);
+            border-color: var(--success-border);
         }
 
         .question-item.incorrect {
             background: var(--error-light);
-            border-color: var(--error);
+            border-color: var(--error-border);
         }
 
         .question-item.unanswered {
             background: var(--warning-light);
-            border-color: var(--warning);
+            border-color: var(--warning-border);
         }
 
         .question-header {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
         }
 
         .question-icon {
             flex-shrink: 0;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -495,8 +653,8 @@
         }
 
         .question-icon svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
         }
 
         .question-content {
@@ -507,11 +665,13 @@
             font-weight: 600;
             margin-bottom: 12px;
             color: var(--text);
+            line-height: 1.6;
         }
 
         .question-answer {
             font-size: 0.95rem;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            line-height: 1.6;
         }
 
         .question-answer span {
@@ -520,62 +680,82 @@
 
         .question-answer .correct-answer {
             color: var(--success);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .question-answer .wrong-answer {
             color: var(--error);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .question-points {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-top: 8px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question-points svg {
+            width: 16px;
+            height: 16px;
         }
 
         /* ========== معلومات التسليم ========== */
         .submission-info {
             text-align: center;
             padding: 20px;
-            background: var(--background);
-            border-radius: 12px;
-            margin: 0 30px 30px;
+            background: var(--background-secondary);
+            border-radius: var(--radius-sm);
+            margin: 0 28px 28px;
             font-size: 0.9rem;
             color: var(--text-muted);
+            border: 1px solid var(--border);
         }
 
         .submission-info p {
             margin: 4px 0;
         }
 
-        /* ========== طباعة التقرير ========== */
-        .print-btn {
-            margin: 0 30px 30px;
+        /* ========== أزرار الإجراءات ========== */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 0 28px 28px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
         }
 
         @media print {
             body {
                 background: white;
             }
-            .timer-bar, .print-btn {
-                display: none;
+            .app-header, .timer-bar, .action-buttons {
+                display: none !important;
             }
             .container {
                 min-height: auto;
+                padding: 0;
             }
             .card {
                 box-shadow: none;
+                border: none;
             }
             .exam-container {
                 padding-top: 0;
+            }
+            .result-header {
+                border-radius: 0;
             }
         }
 
         /* ========== تخصيص SurveyJS ========== */
         .sd-root-modern {
             direction: rtl !important;
-            font-family: inherit !important;
+            font-family: 'Cairo', sans-serif !important;
         }
 
         .sd-container-modern {
@@ -587,11 +767,13 @@
             font-weight: 700 !important;
             text-align: center !important;
             margin-bottom: 1rem !important;
+            color: var(--text) !important;
         }
 
         .sd-description {
             text-align: center !important;
             color: var(--text-muted) !important;
+            font-size: 1rem !important;
         }
 
         .sd-page {
@@ -601,16 +783,17 @@
         .sd-question {
             padding: 1.25rem !important;
             margin-bottom: 1rem !important;
-            border-radius: 12px !important;
-            background: var(--background) !important;
+            border-radius: var(--radius-sm) !important;
+            background: var(--background-secondary) !important;
             border: 1px solid var(--border) !important;
         }
 
         .sd-question__title {
-            font-size: 1.1rem !important;
+            font-size: 1.05rem !important;
             font-weight: 600 !important;
             color: var(--text) !important;
             text-align: right !important;
+            font-family: 'Cairo', sans-serif !important;
         }
 
         .sd-question__description {
@@ -621,21 +804,23 @@
         .sd-item {
             direction: rtl !important;
             text-align: right !important;
-            padding: 10px 12px !important;
-            border-radius: 8px !important;
+            padding: 12px 14px !important;
+            border-radius: var(--radius-sm) !important;
             margin-bottom: 6px !important;
-            transition: background 0.2s !important;
+            transition: all 0.2s !important;
         }
 
         .sd-item--allowhover:hover {
-            background: var(--background) !important;
+            background: var(--primary-bg) !important;
         }
 
         .sd-radio__decorator,
         .sd-checkbox__decorator {
-            margin-left: 10px !important;
+            margin-left: 12px !important;
             margin-right: 0 !important;
             border-color: var(--border) !important;
+            width: 22px !important;
+            height: 22px !important;
         }
 
         .sd-item--checked .sd-radio__decorator,
@@ -644,18 +829,26 @@
             background: var(--primary) !important;
         }
 
+        .sd-item__caption {
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 1rem !important;
+        }
+
         .sd-btn {
-            background: var(--primary) !important;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
             color: white !important;
             border: none !important;
-            border-radius: 8px !important;
-            padding: 12px 24px !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 12px 28px !important;
             font-size: 1rem !important;
             font-weight: 600 !important;
+            font-family: 'Cairo', sans-serif !important;
+            box-shadow: var(--shadow-md) !important;
         }
 
         .sd-btn:hover {
-            background: var(--primary-dark) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-lg) !important;
         }
 
         .sd-navigation {
@@ -672,14 +865,21 @@
         }
 
         .sd-progress-bar__progress {
-            background: var(--primary) !important;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%) !important;
+            border-radius: 4px !important;
+        }
+
+        .sd-progress-bar__text {
+            font-family: 'Cairo', sans-serif !important;
+            color: var(--text-muted) !important;
         }
 
         /* ========== تراكب التقديم ========== */
         .submit-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -687,39 +887,97 @@
         }
 
         .submit-overlay .card {
-            max-width: 300px;
+            max-width: 320px;
         }
 
         .submit-overlay .card-body {
             text-align: center;
             padding: 40px;
         }
+
+        /* ========== حالة فارغة ========== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--background-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .empty-state-icon svg {
+            width: 40px;
+            height: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .demo-link {
+            background: var(--background-secondary);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
+    <!-- الشعار والأيقونة -->
+    <header class="app-header">
+        <div class="app-header-content">
+            <div class="app-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="app-title">نظام الامتحانات الإلكترونية</div>
+                <div class="app-subtitle">منصة الاختبارات التفاعلية</div>
+            </div>
+        </div>
+    </header>
+
     <!-- التطبيق الرئيسي -->
     <div id="app"></div>
 
     <script>
         // ========== إعدادات n8n ==========
         const N8N_CONFIG = {
-            // غيّر هذه القيم إلى روابط n8n الخاصة بك
-            GET_SURVEY_URL: '',  'https://n8n.srv1332143.hstgr.cloud//webhook/get-survey'
-            SUBMIT_EXAM_URL: '', // مثال: 'https://n8n.srv1332143.hstgr.cloud//webhook/submit-exam'
-            
-            // أو استخدم الرابط الأساسي
-            BASE_URL: ''  // مثال: 'https://n8n.srv1332143.hstgr.cloud//webhook'
+            // رابط n8n الخاص بك
+            BASE_URL: 'https://n8n.srv1332143.hstgr.cloud/webhook'
         };
 
         // استخراج الروابط من الإعدادات
         function getGetSurveyUrl() {
-            return N8N_CONFIG.GET_SURVEY_URL || 
-                   (N8N_CONFIG.BASE_URL ? `${N8N_CONFIG.BASE_URL}/get-survey` : null);
+            return `${N8N_CONFIG.BASE_URL}/get-survey`;
         }
 
         function getSubmitUrl() {
-            return N8N_CONFIG.SUBMIT_EXAM_URL || 
-                   (N8N_CONFIG.BASE_URL ? `${N8N_CONFIG.BASE_URL}/submit-exam` : null);
+            return `${N8N_CONFIG.BASE_URL}/submit-exam`;
         }
 
         // ========== بيانات تجريبية ==========
@@ -771,11 +1029,11 @@
         };
 
         const DEMO_CORRECT_ANSWERS = {
-            'q_1': { answer: 'JavaScript', points: 1, question: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب?' },
-            'q_2': { answer: '8', points: 1, question: 'ما هو ناتج: 2 + 2 * 3?' },
+            'q_1': { answer: 'JavaScript', points: 1, question: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب؟' },
+            'q_2': { answer: '8', points: 1, question: 'ما هو ناتج: 2 + 2 * 3؟' },
             'q_3': { answer: ['Python', 'JavaScript', 'SQL'], points: 2, question: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)' },
-            'q_4': { answer: 'Queue', points: 1, question: 'ما هي بنية البيانات التي تتبع مبدأ FIFO?' },
-            'q_5': { answer: 'print("Hello")', points: 1, question: 'ما هو الأمر لطباعة "Hello" في Python?' }
+            'q_4': { answer: 'Queue', points: 1, question: 'ما هي بنية البيانات التي تتبع مبدأ FIFO؟' },
+            'q_5': { answer: 'print("Hello")', points: 1, question: 'ما هو الأمر لطباعة "Hello" في Python؟' }
         };
 
         // ========== حالة التطبيق ==========
@@ -789,7 +1047,7 @@
             startTime: 0,
             timeRemaining: 0,
             timerInterval: null,
-            currentView: 'loading', // loading, error, registration, exam, result
+            currentView: 'loading',
             error: null,
             result: null,
             submitting: false
@@ -798,13 +1056,17 @@
         // ========== أيقونات SVG ==========
         const icons = {
             clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
-            fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+            fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
             user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
             checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
             xCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
             alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
             award: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
-            loader: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`
+            edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+            mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
+            printer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`,
+            refreshCw: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
+            hash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>`
         };
 
         // ========== دوال مساعدة ==========
@@ -843,6 +1105,9 @@
                 case 'error':
                     app.innerHTML = renderError();
                     break;
+                case 'empty':
+                    app.innerHTML = renderEmpty();
+                    break;
                 case 'registration':
                     app.innerHTML = renderRegistration();
                     break;
@@ -861,7 +1126,9 @@
                 <div class="container">
                     <div class="card">
                         <div class="loading-screen">
-                            <div class="spinner"></div>
+                            <div class="loading-icon">
+                                <div class="spinner"></div>
+                            </div>
                             <p class="loading-text">جاري تحميل الامتحان...</p>
                         </div>
                     </div>
@@ -880,8 +1147,42 @@
                             <h2 class="error-title">حدث خطأ</h2>
                             <p class="error-message">${appState.error || 'حدث خطأ غير متوقع'}</p>
                             <button class="btn btn-primary" onclick="location.reload()" style="max-width: 200px; margin: 0 auto;">
+                                ${icons.refreshCw}
                                 إعادة المحاولة
                             </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmpty() {
+            return `
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-icon">
+                                ${icons.edit}
+                            </div>
+                            <h1>مرحباً بك في نظام الامتحانات</h1>
+                            <p>أدخل معرف الامتحان والرمز للبدء</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    ${icons.fileText}
+                                </div>
+                                <h3 class="empty-state-title">لم يتم تحديد امتحان</h3>
+                                <p class="empty-state-text">
+                                    يجب إضافة معرف الامتحان والرمز في رابط الصفحة
+                                </p>
+                                <div class="demo-link">
+                                    ?exam_id=DEMO&token=DEMO123
+                                </div>
+                                <button class="btn btn-primary" onclick="loadDemoExam()" style="max-width: 280px; margin: 24px auto 0;">
+                                    تجربة الامتحان التجريبي
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -894,6 +1195,9 @@
                 <div class="container">
                     <div class="card">
                         <div class="card-header">
+                            <div class="card-header-icon">
+                                ${icons.fileText}
+                            </div>
                             <h1>${surveyData.title || 'اختبار'}</h1>
                             ${surveyData.description ? `<p>${surveyData.description}</p>` : ''}
                         </div>
@@ -925,11 +1229,13 @@
                                         id="studentName"
                                         placeholder="أدخل اسمك الكامل"
                                         required
+                                        autocomplete="name"
                                     >
                                 </div>
                                 
                                 <div class="form-group">
                                     <label class="form-label">
+                                        ${icons.mail}
                                         البريد الإلكتروني (اختياري)
                                     </label>
                                     <input 
@@ -937,10 +1243,12 @@
                                         class="form-input" 
                                         id="studentEmail"
                                         placeholder="example@email.com"
+                                        autocomplete="email"
                                     >
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary">
+                                    ${icons.edit}
                                     ابدأ الامتحان
                                 </button>
                             </form>
@@ -952,18 +1260,31 @@
 
         function renderExam() {
             const showTimer = appState.timeRemaining > 0;
+            const totalTime = appState.surveyData?.maxTimeToFinish || 1;
+            const percentage = (appState.timeRemaining / totalTime) * 100;
+            let timerClass = '';
+            let progressClass = '';
+            
+            if (appState.timeRemaining <= 60) {
+                timerClass = 'danger';
+                progressClass = 'danger';
+            } else if (appState.timeRemaining <= 180) {
+                timerClass = 'warning';
+                progressClass = 'warning';
+            }
+            
             return `
                 ${showTimer ? `
                     <div class="timer-bar">
                         <div class="timer-content">
                             <div class="timer-label">
                                 ${icons.clock}
-                                <span>الوقت المتبقي:</span>
+                                <span>الوقت المتبقي</span>
                             </div>
-                            <div class="timer-value" id="timerValue">${formatTime(appState.timeRemaining)}</div>
+                            <div class="timer-value ${timerClass}" id="timerValue">${formatTime(appState.timeRemaining)}</div>
                         </div>
                         <div class="timer-progress">
-                            <div class="timer-progress-bar" id="timerProgress" style="width: 100%"></div>
+                            <div class="timer-progress-bar ${progressClass}" id="timerProgress" style="width: ${percentage}%"></div>
                         </div>
                     </div>
                 ` : ''}
@@ -978,7 +1299,9 @@
                     <div class="submit-overlay">
                         <div class="card">
                             <div class="card-body">
-                                <div class="spinner"></div>
+                                <div class="loading-icon">
+                                    <div class="spinner"></div>
+                                </div>
                                 <p class="loading-text">جاري تقديم الامتحان...</p>
                             </div>
                         </div>
@@ -993,7 +1316,7 @@
             const percentage = parseFloat(result.results.percentage);
             
             return `
-                <div class="container" style="align-items: flex-start; padding-top: 40px; padding-bottom: 40px;">
+                <div class="container" style="align-items: flex-start; padding-top: 100px; padding-bottom: 40px;">
                     <div class="card">
                         <div class="result-header ${passed ? 'passed' : 'failed'}">
                             <div class="result-icon">
@@ -1047,7 +1370,10 @@
                                                     <span class="correct-answer">${Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer}</span>
                                                 </p>
                                             ` : ''}
-                                            <p class="question-points">النقاط: ${item.score} / ${item.maxScore}</p>
+                                            <p class="question-points">
+                                                ${icons.hash}
+                                                النقاط: ${item.score} / ${item.maxScore}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -1055,13 +1381,18 @@
                         </div>
                         
                         <div class="submission-info">
-                            <p>معرف التسليم: ${result.submissionId}</p>
-                            <p>تاريخ التسليم: ${formatDate(result.submittedAt)}</p>
+                            <p><strong>معرف التسليم:</strong> ${result.submissionId}</p>
+                            <p><strong>تاريخ التسليم:</strong> ${formatDate(result.submittedAt)}</p>
                         </div>
                         
-                        <div class="print-btn">
-                            <button class="btn btn-secondary" onclick="window.print()" style="width: 100%;">
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="window.print()">
+                                ${icons.printer}
                                 طباعة التقرير
+                            </button>
+                            <button class="btn btn-outline" onclick="goHome()">
+                                ${icons.refreshCw}
+                                امتحان جديد
                             </button>
                         </div>
                     </div>
@@ -1090,12 +1421,10 @@
             
             appState.survey = survey;
             
-            // بدء المؤقت
             if (appState.timeRemaining > 0) {
                 startTimer();
             }
             
-            // عرض الاستبيان
             survey.render('surveyContainer');
         }
 
@@ -1112,12 +1441,15 @@
                 if (timerValue) {
                     timerValue.textContent = formatTime(appState.timeRemaining);
                     
-                    // تحديث اللون
                     timerValue.classList.remove('warning', 'danger');
+                    timerProgress?.classList.remove('warning', 'danger');
+                    
                     if (appState.timeRemaining <= 60) {
                         timerValue.classList.add('danger');
+                        timerProgress?.classList.add('danger');
                     } else if (appState.timeRemaining <= 180) {
                         timerValue.classList.add('warning');
+                        timerProgress?.classList.add('warning');
                     }
                 }
                 
@@ -1128,7 +1460,6 @@
                 
                 if (appState.timeRemaining <= 0) {
                     clearInterval(appState.timerInterval);
-                    // إرسال تلقائي
                     if (appState.survey) {
                         appState.survey.completeLastPage();
                     }
@@ -1136,13 +1467,27 @@
             }, 1000);
         }
 
+        // ========== تحميل الامتحان التجريبي ==========
+        function loadDemoExam() {
+            appState.examId = 'DEMO';
+            appState.token = 'DEMO123';
+            appState.surveyData = DEMO_SURVEY;
+            appState.currentView = 'registration';
+            render();
+        }
+
+        // ========== العودة للصفحة الرئيسية ==========
+        function goHome() {
+            window.location.href = window.location.pathname;
+        }
+
         // ========== جلب بيانات الامتحان ==========
         async function fetchSurvey() {
             const params = getQueryParams();
             
+            // إذا لم يتم تحديد معرف امتحان
             if (!params.examId || !params.token) {
-                appState.error = 'معرف الامتحان والرمز مطلوبان. استخدم: ?exam_id=XXX&token=YYY';
-                appState.currentView = 'error';
+                appState.currentView = 'empty';
                 render();
                 return;
             }
@@ -1150,26 +1495,23 @@
             appState.examId = params.examId;
             appState.token = params.token;
             
-            const n8nUrl = getGetSurveyUrl();
-            
             // الوضع التجريبي
-            if (!n8nUrl && params.examId.toUpperCase() === 'DEMO' && params.token === 'DEMO123') {
+            if (params.examId.toUpperCase() === 'DEMO' && params.token === 'DEMO123') {
                 appState.surveyData = DEMO_SURVEY;
                 appState.currentView = 'registration';
                 render();
                 return;
             }
             
-            // بدون n8n
-            if (!n8nUrl) {
-                appState.error = 'لم يتم تكوين رابط n8n. للتجربة استخدم: ?exam_id=DEMO&token=DEMO123';
-                appState.currentView = 'error';
-                render();
-                return;
-            }
-            
             try {
-                const response = await fetch(`${n8nUrl}?exam_id=${encodeURIComponent(params.examId)}&token=${encodeURIComponent(params.token)}`);
+                const url = `${getGetSurveyUrl()}?exam_id=${encodeURIComponent(params.examId)}&token=${encodeURIComponent(params.token)}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
@@ -1200,7 +1542,11 @@
             appState.studentEmail = emailInput.value.trim();
             
             if (!appState.studentName) {
-                alert('الرجاء إدخال اسمك');
+                nameInput.focus();
+                nameInput.style.borderColor = 'var(--error)';
+                setTimeout(() => {
+                    nameInput.style.borderColor = '';
+                }, 2000);
                 return;
             }
             
@@ -1231,10 +1577,8 @@
                 finishedAt: new Date().toISOString()
             };
             
-            const n8nUrl = getSubmitUrl();
-            
             // الوضع التجريبي
-            if (!n8nUrl) {
+            if (appState.examId.toUpperCase() === 'DEMO') {
                 const result = calculateDemoResult(answers, timeSpent);
                 appState.result = result;
                 appState.submitting = false;
@@ -1249,10 +1593,11 @@
             }
             
             try {
-                const response = await fetch(n8nUrl, {
+                const response = await fetch(getSubmitUrl(), {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
