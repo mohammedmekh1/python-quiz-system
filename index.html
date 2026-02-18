@@ -180,25 +180,33 @@
         }
 
         function startExam() {
-            DOM.startFormState.classList.add('hidden');
-            DOM.surveyWrapper.classList.remove('hidden');
-            DOM.timerWrapper.classList.remove('hidden');
-            
-            state.startTime = Date.now();
-            
-            // تهيئة نموذج الاختبار
-            const survey = new Survey.Model(state.examData);
-            survey.locale = 'ar';
-            
-            // رندرة الاختبار في الصفحة
-            survey.render("surveyContainer");
-            
-            survey.onComplete.add(result => {
-                submitAnswers(result.data);
-            });
+    // 1. إظهار وإخفاء العناصر
+    DOM.startFormState.classList.add('hidden');
+    DOM.surveyWrapper.classList.remove('hidden');
+    DOM.timerWrapper.classList.remove('hidden');
+    
+    state.startTime = Date.now();
+    
+    // 2. إنشاء النموذج
+    const survey = new Survey.Model(state.examData);
+    survey.locale = 'ar';
+    
+    // 3. الربط بالعنصر (هذا هو الإصلاح)
+    // نستخدم معرف العنصر مباشرة في الطريقة المتوافقة مع الـ UI
+    const surveyElement = document.getElementById("surveyContainer");
+    if (surveyElement) {
+        // نستخدم Render الخاص بـ SurveyJS UI
+        const surveyUI = new Survey.Survey(survey);
+        surveyUI.render(surveyElement);
+    }
+    
+    // 4. الأحداث
+    survey.onComplete.add(result => {
+        submitAnswers(result.data);
+    });
 
-            startTimer(state.examData.durationMin || 15);
-        }
+    startTimer(state.examData.durationMin || 15);
+}
 
         function startTimer(mins) {
             let timeLeft = mins * 60;
