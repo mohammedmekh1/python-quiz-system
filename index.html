@@ -4,34 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>نظام الاختبارات - أساسيات البرمجة</title>
+  
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
+  
   <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-i18n"></script>
+
   <style>
-    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; direction: rtl; padding: 20px; }
+    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; direction: rtl; padding: 20px; margin: 0; }
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    #surveyContainer { margin-top: 20px; min-height: 500px; }
-    #loading, #error { text-align: center; display: none; margin: 20px; }
-    #error { color: #d32f2f; font-weight: bold; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
-    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    h1 { color: #1e3a8a; text-align: center; }
+    #studentForm { margin-top: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 10px; }
+    button:hover { background: #2b4ec2; }
+    #surveyContainer { margin-top: 30px; min-height: 500px; }
+    #loading, #error { text-align: center; display: none; padding: 20px; font-size: 18px; }
+    #error { color: #d32f2f; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 id="quizTitle">اختبار البرمجة</h1>
+    <h1>اختبار بايثون</h1>
+    
     <div id="studentForm">
-      <input type="text" id="studentName" placeholder="الاسم الكامل" required />
-      <input type="email" id="studentEmail" placeholder="البريد الإلكتروني" required />
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" id="studentName" placeholder="اكتب اسمك هنا" required />
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="studentEmail" placeholder="example@domain.com" required />
+      </div>
       <button onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
-    <div id="loading">جاري تحميل الأسئلة...</div>
+
+    <div id="loading">جاري جلب الأسئلة من السيرفر...</div>
     <div id="error"></div>
     <div id="surveyContainer"></div>
   </div>
 
   <script>
+    // الروابط المباشرة لـ n8n
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
 
@@ -39,50 +56,72 @@
     const examId = urlParams.get('exam');
     const token = urlParams.get('token');
 
+    // تعريف الدالة في النطاق العام لتجنب ReferenceError
     async function startExam() {
-      const name = document.getElementById('studentName').value.trim();
-      const email = document.getElementById('studentEmail').value.trim();
+      const nameField = document.getElementById('studentName');
+      const emailField = document.getElementById('studentEmail');
+      
+      const name = nameField.value.trim();
+      const email = emailField.value.trim();
 
       if (!name || !email.includes('@')) {
-        alert('يرجى إدخال البيانات بشكل صحيح');
+        alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
         return;
       }
 
+      if (!examId || !token) {
+        alert('خطأ: معرف الاختبار أو التوكن مفقود من الرابط');
+        return;
+      }
+
+      // إخفاء النموذج وإظهار التحميل
       document.getElementById('studentForm').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
 
       try {
         const fetchUrl = `${GET_URL}?exam=${examId}&token=${token}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+        
         const response = await fetch(fetchUrl);
-        const surveyData = await response.json();
+        if (!response.ok) throw new Error("فشل الاتصال بسيرفر n8n");
 
+        const surveyData = await response.json();
+        
         document.getElementById('loading').style.display = 'none';
 
-        // تهيئة ورسم الاختبار
+        // تهيئة واجهة الاختبار SurveyJS
         const survey = new Survey.Model(surveyData);
-        survey.locale = "ar"; 
-        
-        // التأكد من ظهور الحاوية ورسم الاختبار
-        const container = document.getElementById("surveyContainer");
-        container.style.display = "block";
+        survey.locale = "ar"; // تفعيل اللغة العربية
+
+        // رسم الاختبار
         survey.render("surveyContainer");
 
+        // إرسال النتائج عند الانتهاء
         survey.onComplete.add(async (sender) => {
-          await fetch(POST_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              exam: examId,
-              studentName: name,
-              studentEmail: email,
-              answers: sender.data
-            })
-          });
+          const results = {
+            exam: examId,
+            token: token,
+            studentName: name,
+            studentEmail: email,
+            answers: sender.data,
+            finishedAt: new Date().toISOString()
+          };
+
+          try {
+            await fetch(POST_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(results)
+            });
+          } catch (e) {
+            console.error("خطأ في إرسال النتائج:", e);
+          }
         });
+
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "فشل في عرض الاختبار. تأكد من اتصال الإنترنت.";
+        document.getElementById('error').textContent = "عذراً، حدث خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
+        console.error(err);
       }
     }
   </script>
