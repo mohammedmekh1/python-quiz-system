@@ -5,76 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>اختبار بايثون – نظام الاختبارات</title>
 
-  <!-- خطوط عربية جميلة -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- SurveyJS -->
   <link href="https://unpkg.com/survey-core@1.12.15/defaultV2.min.css" rel="stylesheet" />
   <script src="https://unpkg.com/survey-core@1.12.15/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-core@1.12.15/survey.i18n.min.js"></script>
 
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      padding: 20px;
-      direction: rtl;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #1e3a8a;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      background: #1e3a8a;
-      color: white;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #2b4ec2;
-    }
-    #surveyContainer {
-      margin-top: 30px;
-    }
-    #loading, #error {
-      text-align: center;
-      font-size: 18px;
-      margin: 30px 0;
-      display: none;
-    }
+    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; direction: rtl; }
+    .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    h1 { color: #1e3a8a; text-align: center; margin-bottom: 30px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    button:hover { background: #2b4ec2; }
+    #surveyContainer { margin-top: 30px; }
+    #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
   </style>
@@ -82,7 +28,6 @@
 <body>
   <div class="container">
     <h1>اختبار بايثون</h1>
-
     <div id="studentForm">
       <div class="form-group">
         <label for="studentName">الاسم الكامل</label>
@@ -94,30 +39,30 @@
       </div>
       <button onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
-
     <div id="loading">جاري تحميل الأسئلة...</div>
     <div id="error"></div>
     <div id="surveyContainer"></div>
   </div>
 
   <script>
-    // قراءة exam_id من الرابط
+    // 1. تحديد روابط n8n (يفضل استبدالها بمتغيرات Vercel في لوحة التحكم)
+    const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
+    const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
+
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam');
+    const token = urlParams.get('token') || 'default_token';
 
     if (!examId) {
-      document.getElementById('error').textContent = 'معرف الاختبار غير موجود في الرابط (?exam=...)';
+      document.getElementById('error').textContent = 'خطأ: معرف الاختبار (exam) مفقود من الرابط.';
       document.getElementById('error').style.display = 'block';
     }
 
-    // رابط n8n من متغير البيئة أو قيمة افتراضية
-    const N8N_WEBHOOK = window.N8N_WEBHOOK_URL || 'https://n8n.srv1332143.hstgr.cloud/webhook/get-survey';
-
     async function startExam() {
       const name = document.getElementById('studentName').value.trim();
-      const email = document.getElementById('studentEmail').value.trim().toLowerCase();
+      const email = document.getElementById('studentEmail').value.trim();
 
-      if (!name ⠺⠵⠟⠺⠵⠵⠺⠺ !email.includes('@')) {
+      if (!name || !email.includes('@')) {
         alert('يرجى إدخال اسمك والبريد الإلكتروني بشكل صحيح');
         return;
       }
@@ -126,36 +71,46 @@
       document.getElementById('loading').style.display = 'block';
 
       try {
-        const url = \( {N8N_WEBHOOK}?exam= \){encodeURIComponent(examId)}&name=\( {encodeURIComponent(name)}&email= \){encodeURIComponent(email)};
-
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (!response.ok) {
-          throw new Error(خطأ في الاتصال: ${response.status} - ${response.statusText});
-        }
-if (data.error) {
-          throw new Error(data.error);
-        }
-
-        // إخفاء التحميل وعرض الاستطلاع
+        // بناء الرابط بشكل صحيح
+        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+        
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error(`خطأ في السيرفر: ${response.status}`);
+        
+        const surveyData = await response.json();
         document.getElementById('loading').style.display = 'none';
 
-        // تهيئة SurveyJS باللغة العربية
-        Survey.surveyLocalization.currentLocale = "ar";
-        const survey = new Survey.Model(data);
+        // تشغيل SurveyJS
+        const survey = new Survey.Model(surveyData);
+        
+        // عند الانتهاء، أرسل الإجابات إلى n8n
+        survey.onComplete.add(async (sender) => {
+            const results = {
+                exam: examId,
+                token: token,
+                studentName: name,
+                studentEmail: email,
+                answers: sender.data,
+                finishedAt: new Date().toISOString()
+            };
+
+            await fetch(POST_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(results)
+            });
+            console.log("تم إرسال النتائج بنجاح");
+        });
+
         survey.render("surveyContainer");
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = 'حدث خطأ: ' + err.message;
+        document.getElementById('error').textContent = "فشل تحميل الأسئلة. تأكد من أن n8n يعمل.";
         document.getElementById('error').style.display = 'block';
-        console.error('خطأ كامل:', err);
+        console.error(err);
       }
     }
   </script>
 </body>
 </html>
-        const data = await response.json();
