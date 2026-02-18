@@ -58,59 +58,61 @@
       document.getElementById('error').style.display = 'block';
     }
 
-    async function startExam() {
-      const name = document.getElementById('studentName').value.trim();
-      const email = document.getElementById('studentEmail').value.trim();
+   async function startExam() {
+  const name = document.getElementById('studentName').value.trim();
+  const email = document.getElementById('studentEmail').value.trim();
 
-      if (!name || !email.includes('@')) {
-        alert('يرجى إدخال اسمك والبريد الإلكتروني بشكل صحيح');
-        return;
-      }
+  if (!name || !email) {
+    alert('يرجى ملء الاسم والإيميل');
+    return;
+  }
 
-      document.getElementById('studentForm').style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
+  document.getElementById('studentForm').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
 
-      try {
-        // بناء الرابط بشكل صحيح
-        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
-        
-        const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error(`خطأ في السيرفر: ${response.status}`);
-        
-        const surveyData = await response.json();
-        document.getElementById('loading').style.display = 'none';
+  try {
+    const url = \( {N8N_WEBHOOK}?exam= \){encodeURIComponent(examId)}&name=\( {encodeURIComponent(name)}&email= \){encodeURIComponent(email)};
 
-        // تشغيل SurveyJS
-        const survey = new Survey.Model(surveyData);
-        
-        // عند الانتهاء، أرسل الإجابات إلى n8n
-        survey.onComplete.add(async (sender) => {
-            const results = {
-                exam: examId,
-                token: token,
-                studentName: name,
-                studentEmail: email,
-                answers: sender.data,
-                finishedAt: new Date().toISOString()
-            };
+    const response = await fetch(url);
 
-            await fetch(POST_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(results)
-            });
-            console.log("تم إرسال النتائج بنجاح");
-        });
+    if (!response.ok) throw new Error(خطأ ${response.status});
 
-        survey.render("surveyContainer");
+    const data = await response.json();
 
-      } catch (err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "فشل تحميل الأسئلة. تأكد من أن n8n يعمل.";
-        document.getElementById('error').style.display = 'block';
-        console.error(err);
-      }
+    if (data.error) throw new Error(data.error);
+
+    console.log('البيانات المستلمة:', data); // ده اللي ظهر عندك
+
+    // إصلاحات مهمة لـ SurveyJS
+    if (!data.pages || !Array.isArray(data.pages)) {
+      throw new Error('الاستطلاع لا يحتوي على صفحات أو عناصر صالحة');
     }
+
+    // تأكيد اللغة العربية
+    Survey.surveyLocalization.currentLocale = "ar";
+
+    // إنشاء النموذج
+    const survey = new Survey.Model(data);
+
+    // إضافة معالجة أخطاء داخلية
+    survey.onError.add((sender, options) => {
+      console.error('خطأ داخل SurveyJS:', options.error);
+      document.getElementById('error').textContent = 'خطأ في عرض الأسئلة: ' + options.error;
+      document.getElementById('error').style.display = 'block';
+    });
+
+    // عرض الاستطلاع
+    survey.render("surveyContainer");
+
+    document.getElementById('loading').style.display = 'none';
+
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').textContent = 'خطأ: ' + err.message;
+    document.getElementById('error').style.display = 'block';
+    console.error('خطأ كامل:', err);
+  }
+
   </script>
 </body>
 </html>
