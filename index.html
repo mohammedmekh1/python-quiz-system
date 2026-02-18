@@ -3,41 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>اختبار بايثون – نظام الاختبارات</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/survey-core@1.12.15/defaultV2.min.css" rel="stylesheet" />
-  <script src="https://unpkg.com/survey-core@1.12.15/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-core@1.12.15/survey.i18n.min.js"></script>
-
+  <title>نظام الاختبارات - أساسيات البرمجة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
+  <script src="https://unpkg.com/survey-i18n"></script>
   <style>
-    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; direction: rtl; }
+    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; direction: rtl; padding: 20px; }
     .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    h1 { color: #1e3a8a; text-align: center; margin-bottom: 30px; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 400px; } /* تم إضافة ارتفاع أدنى لضمان الظهور */
-    #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
+    #surveyContainer { margin-top: 20px; min-height: 500px; }
+    #loading, #error { text-align: center; display: none; margin: 20px; }
     #error { color: #d32f2f; font-weight: bold; }
-    #loading { color: #1e3a8a; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>اختبار بايثون</h1>
+    <h1 id="quizTitle">اختبار البرمجة</h1>
     <div id="studentForm">
-      <div class="form-group">
-        <label for="studentName">الاسم الكامل</label>
-        <input type="text" id="studentName" placeholder="اكتب اسمك هنا" required />
-      </div>
-      <div class="form-group">
-        <label for="studentEmail">البريد الإلكتروني</label>
-        <input type="email" id="studentEmail" placeholder="example@domain.com" required />
-      </div>
-      <button id="startBtn" onclick="startExam()">ابدأ الاختبار الآن</button>
+      <input type="text" id="studentName" placeholder="الاسم الكامل" required />
+      <input type="email" id="studentEmail" placeholder="البريد الإلكتروني" required />
+      <button onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
     <div id="loading">جاري تحميل الأسئلة...</div>
     <div id="error"></div>
@@ -45,7 +32,6 @@
   </div>
 
   <script>
-    // تصحيح الروابط: دمجنا الرابط الأساسي مع المسار الصحيح
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
 
@@ -53,76 +39,52 @@
     const examId = urlParams.get('exam');
     const token = urlParams.get('token');
 
-    // التحقق من وجود المعلمات المطلوبة
-    if (!examId || !token) {
-      document.getElementById('error').textContent = 'خطأ: الرابط غير صالح. تأكد من وجود معرف الاختبار والتوكن.';
-      document.getElementById('error').style.display = 'block';
+    async function startExam() {
+      const name = document.getElementById('studentName').value.trim();
+      const email = document.getElementById('studentEmail').value.trim();
+
+      if (!name || !email.includes('@')) {
+        alert('يرجى إدخال البيانات بشكل صحيح');
+        return;
+      }
+
       document.getElementById('studentForm').style.display = 'none';
-    }
+      document.getElementById('loading').style.display = 'block';
 
- async function startExam() {
-  const name = document.getElementById('studentName').value.trim();
-  const email = document.getElementById('studentEmail').value.trim();
+      try {
+        const fetchUrl = `${GET_URL}?exam=${examId}&token=${token}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+        const response = await fetch(fetchUrl);
+        const surveyData = await response.json();
 
-  if (!name || !email.includes('@')) {
-    alert('يرجى إدخال اسمك والبريد الإلكتروني بشكل صحيح');
-    return;
-  }
+        document.getElementById('loading').style.display = 'none';
 
-  // 1. إخفاء النموذج وإظهار رسالة التحميل
-  document.getElementById('studentForm').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
+        // تهيئة ورسم الاختبار
+        const survey = new Survey.Model(surveyData);
+        survey.locale = "ar"; 
+        
+        // التأكد من ظهور الحاوية ورسم الاختبار
+        const container = document.getElementById("surveyContainer");
+        container.style.display = "block";
+        survey.render("surveyContainer");
 
-  try {
-    const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-    const response = await fetch(fetchUrl);
-    
-    if (!response.ok) throw new Error("فشل الاتصال بـ n8n");
-
-    const surveyData = await response.json();
-    console.log("تم استلام البيانات، جاري الرسم...", surveyData);
-
-    // 2. إخفاء رسالة التحميل تماماً
-    document.getElementById('loading').style.display = 'none';
-
-    // 3. تهيئة نموذج الاختبار وضبط الإعدادات
-    const survey = new Survey.Model(surveyData);
-    
-    // ضبط اللغة للعربية لضمان توافق الاتجاهات والأزرار
-    survey.locale = "ar";
-
-    // 4. التأكد من أن حاوية الرسم (Container) ظاهرة ولها مساحة
-    const container = document.getElementById("surveyContainer");
-    container.innerHTML = ""; // تنظيف أي محتوى قديم
-    container.style.display = "block";
-    container.style.minHeight = "600px"; // ضمان وجود مساحة للرؤية
-
-    // 5. الأمر النهائي للرسم
-    survey.render("surveyContainer");
-
-    // إرسال النتائج عند الانتهاء
-    survey.onComplete.add(async (sender) => {
-        const results = {
-            exam: examId,
-            token: token,
-            studentName: name,
-            studentEmail: email,
-            answers: sender.data,
-            finishedAt: new Date().toISOString()
-        };
-        fetch(POST_URL, {
+        survey.onComplete.add(async (sender) => {
+          await fetch(POST_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(results)
+            body: JSON.stringify({
+              exam: examId,
+              studentName: name,
+              studentEmail: email,
+              answers: sender.data
+            })
+          });
         });
-    });
-
-  } catch (err) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error').textContent = "حدث خطأ أثناء تشغيل الاختبار: " + err.message;
-    document.getElementById('error').style.display = 'block';
-  }
-
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').textContent = "فشل في عرض الاختبار. تأكد من اتصال الإنترنت.";
+        document.getElementById('error').style.display = 'block';
+      }
+    }
   </script>
 </body>
 </html>
