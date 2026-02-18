@@ -19,7 +19,7 @@
     input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; }
+    #surveyContainer { margin-top: 30px; min-height: 400px; } /* تم إضافة ارتفاع أدنى لضمان الظهور */
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
@@ -37,7 +37,7 @@
         <label for="studentEmail">البريد الإلكتروني</label>
         <input type="email" id="studentEmail" placeholder="example@domain.com" required />
       </div>
-      <button onclick="startExam()">ابدأ الاختبار الآن</button>
+      <button id="startBtn" onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
     <div id="loading">جاري تحميل الأسئلة...</div>
     <div id="error"></div>
@@ -45,17 +45,19 @@
   </div>
 
   <script>
-    // 1. تحديد روابط n8n (يفضل استبدالها بمتغيرات Vercel في لوحة التحكم)
+    // تصحيح الروابط: دمجنا الرابط الأساسي مع المسار الصحيح
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
 
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam');
-    const token = urlParams.get('token') || 'default_token';
+    const token = urlParams.get('token');
 
-    if (!examId) {
-      document.getElementById('error').textContent = 'خطأ: معرف الاختبار (exam) مفقود من الرابط.';
+    // التحقق من وجود المعلمات المطلوبة
+    if (!examId || !token) {
+      document.getElementById('error').textContent = 'خطأ: الرابط غير صالح. تأكد من وجود معرف الاختبار والتوكن.';
       document.getElementById('error').style.display = 'block';
+      document.getElementById('studentForm').style.display = 'none';
     }
 
     async function startExam() {
@@ -71,19 +73,22 @@
       document.getElementById('loading').style.display = 'block';
 
       try {
-        // بناء الرابط بشكل صحيح
-        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
         
+        console.log("جاري طلب البيانات من:", fetchUrl);
+
         const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error(`خطأ في السيرفر: ${response.status}`);
+        if (!response.ok) throw new Error(`خطأ 403: تأكد من التوكن أو تفعيل Webhook في n8n`);
         
         const surveyData = await response.json();
+        console.log("البيانات المستلمة:", surveyData);
+
         document.getElementById('loading').style.display = 'none';
 
-        // تشغيل SurveyJS
+        // تهيئة ورسم الاختبار
         const survey = new Survey.Model(surveyData);
         
-        // عند الانتهاء، أرسل الإجابات إلى n8n
+        // عند الانتهاء
         survey.onComplete.add(async (sender) => {
             const results = {
                 exam: examId,
@@ -94,19 +99,18 @@
                 finishedAt: new Date().toISOString()
             };
 
-            await fetch(POST_URL, {
+            fetch(POST_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(results)
-            });
-            console.log("تم إرسال النتائج بنجاح");
+            }).catch(err => console.error("فشل إرسال النتائج:", err));
         });
 
         survey.render("surveyContainer");
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "فشل تحميل الأسئلة. تأكد من أن n8n يعمل.";
+        document.getElementById('error').innerHTML = `فشل تحميل الاختبار.<br><small>${err.message}</small>`;
         document.getElementById('error').style.display = 'block';
         console.error(err);
       }
