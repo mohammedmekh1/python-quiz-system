@@ -1,129 +1,1704 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>نظام الاختبارات - أساسيات البرمجة</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
-  
-  <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-i18n"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الامتحانات الإلكترونية</title>
+    
+    <!-- Google Fonts - Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- SurveyJS -->
+    <script src="https://unpkg.com/survey-core@2.5.10/survey.core.min.js"></script>
+    <script src="https://unpkg.com/survey-core@2.5.10/survey.i18n.min.js"></script>
+    <link href="https://unpkg.com/survey-core@2.5.10/defaultV2.min.css" rel="stylesheet" type="text/css" />
+    
+    <style>
+        /* ========== المتغيرات الأساسية ========== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --success: #059669;
+            --success-light: #ecfdf5;
+            --success-border: #a7f3d0;
+            --error: #dc2626;
+            --error-light: #fef2f2;
+            --error-border: #fecaca;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --warning-border: #fde68a;
+            --background: #ffffff;
+            --background-secondary: #f9fafb;
+            --card: #ffffff;
+            --text: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-lg: 24px;
+        }
 
-  <style>
-    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; direction: rtl; padding: 20px; margin: 0; }
-    .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    h1 { color: #1e3a8a; text-align: center; }
-    #studentForm { margin-top: 20px; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 10px; }
-    button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 500px; }
-    #loading, #error { text-align: center; display: none; padding: 20px; font-size: 18px; }
-    #error { color: #d32f2f; }
-  </style>
+        /* ========== إعادة تعيين الأنماط الأساسية ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* ========== الحاوية الرئيسية ========== */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== الشعار والأيقونة ========== */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 16px 24px;
+        }
+
+        .app-header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .app-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .app-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* ========== البطاقات ========== */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            width: 100%;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: var(--background-secondary);
+            padding: 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header-icon svg {
+            width: 36px;
+            height: 36px;
+            color: white;
+        }
+
+        .card-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 32px;
+        }
+
+        /* ========== حالات التحميل ========== */
+        .loading-screen, .error-screen {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .loading-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* ========== رسائل الخطأ ========== */
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--error-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .error-icon svg {
+            width: 40px;
+            height: 40px;
+            color: var(--error);
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--error);
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        /* ========== شاشة التسجيل ========== */
+        .registration-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-label .required {
+            color: var(--error);
+        }
+
+        .form-label svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
+            direction: rtl;
+            text-align: right;
+            background: var(--background);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-bg);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ========== شارات المعلومات ========== */
+        .info-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--background-secondary);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        .badge svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary);
+        }
+
+        /* ========== الأزرار ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 100%;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--background-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-bg);
+        }
+
+        /* ========== الفاصل ========== */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 28px 0;
+        }
+
+        /* ========== شريط الوقت ========== */
+        .timer-bar {
+            position: fixed;
+            top: 77px;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            z-index: 90;
+        }
+
+        .timer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .timer-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .timer-label svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        .timer-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            font-family: 'Cairo', monospace;
+            color: var(--text);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .timer-value.warning {
+            color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        .timer-value.danger {
+            color: var(--error);
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer-progress {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .timer-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 2px;
+            transition: width 1s linear;
+        }
+
+        .timer-progress-bar.warning {
+            background: linear-gradient(90deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .timer-progress-bar.danger {
+            background: linear-gradient(90deg, var(--error) 0%, #f87171 100%);
+        }
+
+        /* ========== حاوية الامتحان ========== */
+        .exam-container {
+            padding-top: 160px;
+            padding-bottom: 40px;
+        }
+
+        .exam-container.no-timer {
+            padding-top: 100px;
+        }
+
+        /* ========== شاشة النتائج ========== */
+        .result-header {
+            padding: 48px;
+            text-align: center;
+        }
+
+        .result-header.passed {
+            background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+            color: white;
+        }
+
+        .result-header.failed {
+            background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .result-icon {
+            width: 88px;
+            height: 88px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .result-subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        /* ========== إحصائيات النتيجة ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 28px;
+        }
+
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--background-secondary);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-value.success { color: var(--success); }
+        .stat-value.error { color: var(--error); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* ========== تفاصيل الأسئلة ========== */
+        .questions-details {
+            padding: 0 28px 28px;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+        }
+
+        .section-title svg {
+            width: 22px;
+            height: 22px;
+            color: var(--primary);
+        }
+
+        .question-item {
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 2px solid;
+            transition: all 0.2s;
+        }
+
+        .question-item:hover {
+            transform: translateX(-4px);
+        }
+
+        .question-item.correct {
+            background: var(--success-light);
+            border-color: var(--success-border);
+        }
+
+        .question-item.incorrect {
+            background: var(--error-light);
+            border-color: var(--error-border);
+        }
+
+        .question-item.unanswered {
+            background: var(--warning-light);
+            border-color: var(--warning-border);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .question-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-item.correct .question-icon {
+            background: var(--success);
+            color: white;
+        }
+
+        .question-item.incorrect .question-icon {
+            background: var(--error);
+            color: white;
+        }
+
+        .question-item.unanswered .question-icon {
+            background: var(--warning);
+            color: white;
+        }
+
+        .question-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .question-answer {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        .question-answer span {
+            color: var(--text-muted);
+        }
+
+        .question-answer .correct-answer {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .question-answer .wrong-answer {
+            color: var(--error);
+            font-weight: 700;
+        }
+
+        .question-points {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question-points svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========== معلومات التسليم ========== */
+        .submission-info {
+            text-align: center;
+            padding: 20px;
+            background: var(--background-secondary);
+            border-radius: var(--radius-sm);
+            margin: 0 28px 28px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .submission-info p {
+            margin: 4px 0;
+        }
+
+        /* ========== أزرار الإجراءات ========== */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 0 28px 28px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .app-header, .timer-bar, .action-buttons {
+                display: none !important;
+            }
+            .container {
+                min-height: auto;
+                padding: 0;
+            }
+            .card {
+                box-shadow: none;
+                border: none;
+            }
+            .exam-container {
+                padding-top: 0;
+            }
+            .result-header {
+                border-radius: 0;
+            }
+        }
+
+        /* ========== تخصيص SurveyJS ========== */
+        .sd-root-modern {
+            direction: rtl !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .sd-container-modern {
+            direction: rtl !important;
+        }
+
+        .sd-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            margin-bottom: 1rem !important;
+            color: var(--text) !important;
+        }
+
+        .sd-description {
+            text-align: center !important;
+            color: var(--text-muted) !important;
+            font-size: 1rem !important;
+        }
+
+        .sd-page {
+            padding: 1.5rem !important;
+        }
+
+        .sd-question {
+            padding: 1.25rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: var(--radius-sm) !important;
+            background: var(--background-secondary) !important;
+            border: 1px solid var(--border) !important;
+        }
+
+        .sd-question__title {
+            font-size: 1.05rem !important;
+            font-weight: 600 !important;
+            color: var(--text) !important;
+            text-align: right !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .sd-question__description {
+            color: var(--text-muted) !important;
+            font-size: 0.9rem !important;
+        }
+
+        .sd-item {
+            direction: rtl !important;
+            text-align: right !important;
+            padding: 12px 14px !important;
+            border-radius: var(--radius-sm) !important;
+            margin-bottom: 6px !important;
+            transition: all 0.2s !important;
+        }
+
+        .sd-item--allowhover:hover {
+            background: var(--primary-bg) !important;
+        }
+
+        .sd-radio__decorator,
+        .sd-checkbox__decorator {
+            margin-left: 12px !important;
+            margin-right: 0 !important;
+            border-color: var(--border) !important;
+            width: 22px !important;
+            height: 22px !important;
+        }
+
+        .sd-item--checked .sd-radio__decorator,
+        .sd-item--checked .sd-checkbox__decorator {
+            border-color: var(--primary) !important;
+            background: var(--primary) !important;
+        }
+
+        .sd-item__caption {
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 1rem !important;
+        }
+
+        .sd-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 12px 28px !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            font-family: 'Cairo', sans-serif !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .sd-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .sd-navigation {
+            direction: rtl !important;
+            margin-top: 1.5rem !important;
+            padding-top: 1.5rem !important;
+            border-top: 1px solid var(--border) !important;
+        }
+
+        .sd-progress-bar {
+            background: var(--border) !important;
+            border-radius: 4px !important;
+            height: 8px !important;
+        }
+
+        .sd-progress-bar__progress {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%) !important;
+            border-radius: 4px !important;
+        }
+
+        .sd-progress-bar__text {
+            font-family: 'Cairo', sans-serif !important;
+            color: var(--text-muted) !important;
+        }
+
+        /* ========== تراكب التقديم ========== */
+        .submit-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .submit-overlay .card {
+            max-width: 320px;
+        }
+
+        .submit-overlay .card-body {
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* ========== حالة فارغة ========== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--background-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .empty-state-icon svg {
+            width: 40px;
+            height: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .demo-link {
+            background: var(--background-secondary);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>اختبار بايثون</h1>
-    
-    <div id="studentForm">
-      <div class="form-group">
-        <label>الاسم الكامل</label>
-        <input type="text" id="studentName" placeholder="اكتب اسمك هنا" required />
-      </div>
-      <div class="form-group">
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="studentEmail" placeholder="example@domain.com" required />
-      </div>
-      <button onclick="startExam()">ابدأ الاختبار الآن</button>
-    </div>
+    <!-- الشعار والأيقونة -->
+    <header class="app-header">
+        <div class="app-header-content">
+            <div class="app-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="app-title">نظام الامتحانات الإلكترونية</div>
+                <div class="app-subtitle">منصة الاختبارات التفاعلية</div>
+            </div>
+        </div>
+    </header>
 
-    <div id="loading">جاري جلب الأسئلة من السيرفر...</div>
-    <div id="error"></div>
-    <div id="surveyContainer"></div>
-  </div>
+    <!-- التطبيق الرئيسي -->
+    <div id="app"></div>
 
-  <script>
-    // الروابط المباشرة لـ n8n
-    const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
-    const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
+    <script>
+        // ========== إعدادات n8n ==========
+        const N8N_CONFIG = {
+            // رابط n8n الخاص بك
+            BASE_URL: 'https://n8n.srv1332143.hstgr.cloud/webhook'
+        };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const examId = urlParams.get('exam');
-    const token = urlParams.get('token');
+        // استخراج الروابط من الإعدادات
+        function getGetSurveyUrl() {
+            return `${N8N_CONFIG.BASE_URL}/get-survey`;
+        }
 
-    // تعريف الدالة في النطاق العام لتجنب ReferenceError
-    async function startExam() {
-      const nameField = document.getElementById('studentName');
-      const emailField = document.getElementById('studentEmail');
-      
-      const name = nameField.value.trim();
-      const email = emailField.value.trim();
+        function getSubmitUrl() {
+            return `${N8N_CONFIG.BASE_URL}/submit-exam`;
+        }
 
-      if (!name || !email.includes('@')) {
-        alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
-        return;
-      }
+        // ========== بيانات تجريبية ==========
+        const DEMO_SURVEY = {
+            title: 'اختبار تجريبي في البرمجة',
+            description: 'هذا اختبار تجريبي لاختبار النظام',
+            showProgressBar: 'top',
+            showTimerPanel: 'top',
+            maxTimeToFinish: 600,
+            pages: [{
+                elements: [
+                    {
+                        type: 'radiogroup',
+                        name: 'question_1',
+                        title: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب؟',
+                        choices: ['Python', 'JavaScript', 'Java', 'C++'],
+                        correctAnswer: 'JavaScript'
+                    },
+                    {
+                        type: 'radiogroup',
+                        name: 'question_2',
+                        title: 'ما هو ناتج: 2 + 2 * 3؟',
+                        choices: ['8', '12', '6', '10'],
+                        correctAnswer: '8'
+                    },
+                    {
+                        type: 'checkbox',
+                        name: 'question_3',
+                        title: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)',
+                        choices: ['HTML', 'Python', 'CSS', 'JavaScript', 'SQL'],
+                        correctAnswer: ['Python', 'JavaScript', 'SQL']
+                    },
+                    {
+                        type: 'radiogroup',
+                        name: 'question_4',
+                        title: 'ما هي بنية البيانات التي تتبع مبدأ FIFO؟',
+                        choices: ['Stack', 'Queue', 'Tree', 'Graph'],
+                        correctAnswer: 'Queue'
+                    },
+                    {
+                        type: 'radiogroup',
+                        name: 'question_5',
+                        title: 'ما هو الأمر لطباعة "Hello" في Python؟',
+                        choices: ['echo "Hello"', 'print("Hello")', 'console.log("Hello")', 'printf("Hello")'],
+                        correctAnswer: 'print("Hello")'
+                    }
+                ]
+            }]
+        };
 
-      if (!examId || !token) {
-        alert('خطأ: معرف الاختبار أو التوكن مفقود من الرابط');
-        return;
-      }
+        const DEMO_CORRECT_ANSWERS = {
+            'q_1': { answer: 'JavaScript', points: 1, question: 'ما هي لغة البرمجة الأكثر استخداماً لتطوير الويب؟' },
+            'q_2': { answer: '8', points: 1, question: 'ما هو ناتج: 2 + 2 * 3؟' },
+            'q_3': { answer: ['Python', 'JavaScript', 'SQL'], points: 2, question: 'أي من التالي يعتبر لغة برمجة؟ (اختر كل ما ينطبق)' },
+            'q_4': { answer: 'Queue', points: 1, question: 'ما هي بنية البيانات التي تتبع مبدأ FIFO؟' },
+            'q_5': { answer: 'print("Hello")', points: 1, question: 'ما هو الأمر لطباعة "Hello" في Python؟' }
+        };
 
-      // إخفاء النموذج وإظهار التحميل
-      document.getElementById('studentForm').style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
+        // ========== حالة التطبيق ==========
+        let appState = {
+            examId: null,
+            token: null,
+            surveyData: null,
+            survey: null,
+            studentName: '',
+            studentEmail: '',
+            startTime: 0,
+            timeRemaining: 0,
+            timerInterval: null,
+            currentView: 'loading',
+            error: null,
+            result: null,
+            submitting: false
+        };
 
-      try {
-        const fetchUrl = `${GET_URL}?exam=${examId}&token=${token}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-        
-        const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error("فشل الاتصال بسيرفر n8n");
+        // ========== أيقونات SVG ==========
+        const icons = {
+            clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+            user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+            checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+            xCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
+            alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+            award: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
+            edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+            mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
+            printer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`,
+            refreshCw: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
+            hash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>`
+        };
 
-        const surveyData = await response.json();
-        
-        document.getElementById('loading').style.display = 'none';
+        // ========== دوال مساعدة ==========
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                examId: params.get('exam_id') || params.get('exam'),
+                token: params.get('token')
+            };
+        }
 
-        // تهيئة واجهة الاختبار SurveyJS
-        const survey = new Survey.Model(surveyData);
-        survey.locale = "ar"; // تفعيل اللغة العربية
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
 
-        // رسم الاختبار
-        survey.render("surveyContainer");
-
-        // إرسال النتائج عند الانتهاء
-        survey.onComplete.add(async (sender) => {
-          const results = {
-            exam: examId,
-            token: token,
-            studentName: name,
-            studentEmail: email,
-            answers: sender.data,
-            finishedAt: new Date().toISOString()
-          };
-
-          try {
-            await fetch(POST_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(results)
+        function formatDate(isoString) {
+            return new Date(isoString).toLocaleString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
-          } catch (e) {
-            console.error("خطأ في إرسال النتائج:", e);
-          }
-        });
+        }
 
-      } catch (err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "عذراً، حدث خطأ: " + err.message;
-        document.getElementById('error').style.display = 'block';
-        console.error(err);
-      }
-    }
-  </script>
+        // ========== عرض الواجهات ==========
+        function render() {
+            const app = document.getElementById('app');
+            
+            switch(appState.currentView) {
+                case 'loading':
+                    app.innerHTML = renderLoading();
+                    break;
+                case 'error':
+                    app.innerHTML = renderError();
+                    break;
+                case 'empty':
+                    app.innerHTML = renderEmpty();
+                    break;
+                case 'registration':
+                    app.innerHTML = renderRegistration();
+                    break;
+                case 'exam':
+                    app.innerHTML = renderExam();
+                    initSurvey();
+                    break;
+                case 'result':
+                    app.innerHTML = renderResult();
+                    break;
+            }
+        }
+
+        function renderLoading() {
+            return `
+                <div class="container">
+                    <div class="card">
+                        <div class="loading-screen">
+                            <div class="loading-icon">
+                                <div class="spinner"></div>
+                            </div>
+                            <p class="loading-text">جاري تحميل الامتحان...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderError() {
+            return `
+                <div class="container">
+                    <div class="card">
+                        <div class="error-screen">
+                            <div class="error-icon">
+                                ${icons.alertCircle}
+                            </div>
+                            <h2 class="error-title">حدث خطأ</h2>
+                            <p class="error-message">${appState.error || 'حدث خطأ غير متوقع'}</p>
+                            <button class="btn btn-primary" onclick="location.reload()" style="max-width: 200px; margin: 0 auto;">
+                                ${icons.refreshCw}
+                                إعادة المحاولة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmpty() {
+            return `
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-icon">
+                                ${icons.edit}
+                            </div>
+                            <h1>مرحباً بك في نظام الامتحانات</h1>
+                            <p>أدخل معرف الامتحان والرمز للبدء</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    ${icons.fileText}
+                                </div>
+                                <h3 class="empty-state-title">لم يتم تحديد امتحان</h3>
+                                <p class="empty-state-text">
+                                    يجب إضافة معرف الامتحان والرمز في رابط الصفحة
+                                </p>
+                                <div class="demo-link">
+                                    ?exam_id=DEMO&token=DEMO123
+                                </div>
+                                <button class="btn btn-primary" onclick="loadDemoExam()" style="max-width: 280px; margin: 24px auto 0;">
+                                    تجربة الامتحان التجريبي
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRegistration() {
+            const surveyData = appState.surveyData;
+            return `
+                <div class="container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-icon">
+                                ${icons.fileText}
+                            </div>
+                            <h1>${surveyData.title || 'اختبار'}</h1>
+                            ${surveyData.description ? `<p>${surveyData.description}</p>` : ''}
+                        </div>
+                        <div class="card-body">
+                            <div class="info-badges">
+                                ${surveyData.maxTimeToFinish ? `
+                                    <span class="badge">
+                                        ${icons.clock}
+                                        المدة: ${Math.floor(surveyData.maxTimeToFinish / 60)} دقيقة
+                                    </span>
+                                ` : ''}
+                                <span class="badge">
+                                    ${icons.fileText}
+                                    ${surveyData.pages[0]?.elements.length || 0} سؤال
+                                </span>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <form class="registration-form" onsubmit="handleStartExam(event)">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        ${icons.user}
+                                        الاسم الكامل <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        class="form-input" 
+                                        id="studentName"
+                                        placeholder="أدخل اسمك الكامل"
+                                        required
+                                        autocomplete="name"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        ${icons.mail}
+                                        البريد الإلكتروني (اختياري)
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        class="form-input" 
+                                        id="studentEmail"
+                                        placeholder="example@email.com"
+                                        autocomplete="email"
+                                    >
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    ${icons.edit}
+                                    ابدأ الامتحان
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExam() {
+            const showTimer = appState.timeRemaining > 0;
+            const totalTime = appState.surveyData?.maxTimeToFinish || 1;
+            const percentage = (appState.timeRemaining / totalTime) * 100;
+            let timerClass = '';
+            let progressClass = '';
+            
+            if (appState.timeRemaining <= 60) {
+                timerClass = 'danger';
+                progressClass = 'danger';
+            } else if (appState.timeRemaining <= 180) {
+                timerClass = 'warning';
+                progressClass = 'warning';
+            }
+            
+            return `
+                ${showTimer ? `
+                    <div class="timer-bar">
+                        <div class="timer-content">
+                            <div class="timer-label">
+                                ${icons.clock}
+                                <span>الوقت المتبقي</span>
+                            </div>
+                            <div class="timer-value ${timerClass}" id="timerValue">${formatTime(appState.timeRemaining)}</div>
+                        </div>
+                        <div class="timer-progress">
+                            <div class="timer-progress-bar ${progressClass}" id="timerProgress" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="container ${!showTimer ? 'exam-container no-timer' : 'exam-container'}">
+                    <div class="card">
+                        <div id="surveyContainer"></div>
+                    </div>
+                </div>
+                
+                ${appState.submitting ? `
+                    <div class="submit-overlay">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="loading-icon">
+                                    <div class="spinner"></div>
+                                </div>
+                                <p class="loading-text">جاري تقديم الامتحان...</p>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderResult() {
+            const result = appState.result;
+            const passed = result.results.passed;
+            const percentage = parseFloat(result.results.percentage);
+            
+            return `
+                <div class="container" style="align-items: flex-start; padding-top: 100px; padding-bottom: 40px;">
+                    <div class="card">
+                        <div class="result-header ${passed ? 'passed' : 'failed'}">
+                            <div class="result-icon">
+                                ${passed ? icons.checkCircle : icons.xCircle}
+                            </div>
+                            <h1 class="result-title">${passed ? 'مبروك! لقد نجحت' : 'للأسف، لم تنجح'}</h1>
+                            <p class="result-subtitle">${result.examInfo.title}</p>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${percentage}%</div>
+                                <div class="stat-label">النسبة المئوية</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${result.results.totalScore}</div>
+                                <div class="stat-label">من ${result.results.maxScore}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value success">${result.results.correctCount}</div>
+                                <div class="stat-label">إجابات صحيحة</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value error">${result.results.totalQuestions - result.results.correctCount}</div>
+                                <div class="stat-label">إجابات خاطئة</div>
+                            </div>
+                        </div>
+                        
+                        <div class="questions-details">
+                            <h3 class="section-title">
+                                ${icons.fileText}
+                                تفاصيل الإجابات
+                            </h3>
+                            ${result.detailedResults.map((item, index) => `
+                                <div class="question-item ${item.isCorrect ? 'correct' : (item.studentAnswer === null ? 'unanswered' : 'incorrect')}">
+                                    <div class="question-header">
+                                        <div class="question-icon">
+                                            ${item.isCorrect ? icons.checkCircle : (item.studentAnswer === null ? icons.alertCircle : icons.xCircle)}
+                                        </div>
+                                        <div class="question-content">
+                                            <p class="question-text">${index + 1}. ${item.question}</p>
+                                            <p class="question-answer">
+                                                <span>إجابتك: </span>
+                                                <span class="${item.isCorrect ? 'correct-answer' : 'wrong-answer'}">
+                                                    ${item.studentAnswer !== null ? (Array.isArray(item.studentAnswer) ? item.studentAnswer.join(', ') : item.studentAnswer) : 'لم تُجب'}
+                                                </span>
+                                            </p>
+                                            ${!item.isCorrect ? `
+                                                <p class="question-answer">
+                                                    <span>الإجابة الصحيحة: </span>
+                                                    <span class="correct-answer">${Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer}</span>
+                                                </p>
+                                            ` : ''}
+                                            <p class="question-points">
+                                                ${icons.hash}
+                                                النقاط: ${item.score} / ${item.maxScore}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="submission-info">
+                            <p><strong>معرف التسليم:</strong> ${result.submissionId}</p>
+                            <p><strong>تاريخ التسليم:</strong> ${formatDate(result.submittedAt)}</p>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="window.print()">
+                                ${icons.printer}
+                                طباعة التقرير
+                            </button>
+                            <button class="btn btn-outline" onclick="goHome()">
+                                ${icons.refreshCw}
+                                امتحان جديد
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== تهيئة SurveyJS ==========
+        function initSurvey() {
+            const survey = new Survey.Model(appState.surveyData);
+            survey.locale = 'ar';
+            
+            survey.onComplete.add(async (sender) => {
+                const plainData = sender.getPlainData();
+                const answers = {};
+                
+                plainData.forEach(question => {
+                    if (question.value !== null && question.value !== undefined) {
+                        const qId = question.name.replace('question_', 'q_');
+                        answers[qId] = question.value;
+                    }
+                });
+                
+                await submitExam(answers);
+            });
+            
+            appState.survey = survey;
+            
+            if (appState.timeRemaining > 0) {
+                startTimer();
+            }
+            
+            survey.render('surveyContainer');
+        }
+
+        // ========== المؤقت ==========
+        function startTimer() {
+            const totalTime = appState.surveyData.maxTimeToFinish;
+            
+            appState.timerInterval = setInterval(() => {
+                appState.timeRemaining--;
+                
+                const timerValue = document.getElementById('timerValue');
+                const timerProgress = document.getElementById('timerProgress');
+                
+                if (timerValue) {
+                    timerValue.textContent = formatTime(appState.timeRemaining);
+                    
+                    timerValue.classList.remove('warning', 'danger');
+                    timerProgress?.classList.remove('warning', 'danger');
+                    
+                    if (appState.timeRemaining <= 60) {
+                        timerValue.classList.add('danger');
+                        timerProgress?.classList.add('danger');
+                    } else if (appState.timeRemaining <= 180) {
+                        timerValue.classList.add('warning');
+                        timerProgress?.classList.add('warning');
+                    }
+                }
+                
+                if (timerProgress) {
+                    const percentage = (appState.timeRemaining / totalTime) * 100;
+                    timerProgress.style.width = `${percentage}%`;
+                }
+                
+                if (appState.timeRemaining <= 0) {
+                    clearInterval(appState.timerInterval);
+                    if (appState.survey) {
+                        appState.survey.completeLastPage();
+                    }
+                }
+            }, 1000);
+        }
+
+        // ========== تحميل الامتحان التجريبي ==========
+        function loadDemoExam() {
+            appState.examId = 'DEMO';
+            appState.token = 'DEMO123';
+            appState.surveyData = DEMO_SURVEY;
+            appState.currentView = 'registration';
+            render();
+        }
+
+        // ========== العودة للصفحة الرئيسية ==========
+        function goHome() {
+            window.location.href = window.location.pathname;
+        }
+
+        // ========== جلب بيانات الامتحان ==========
+        async function fetchSurvey() {
+            const params = getQueryParams();
+            
+            // إذا لم يتم تحديد معرف امتحان
+            if (!params.examId || !params.token) {
+                appState.currentView = 'empty';
+                render();
+                return;
+            }
+            
+            appState.examId = params.examId;
+            appState.token = params.token;
+            
+            // الوضع التجريبي
+            if (params.examId.toUpperCase() === 'DEMO' && params.token === 'DEMO123') {
+                appState.surveyData = DEMO_SURVEY;
+                appState.currentView = 'registration';
+                render();
+                return;
+            }
+            
+            try {
+                const url = `${getGetSurveyUrl()}?exam_id=${encodeURIComponent(params.examId)}&token=${encodeURIComponent(params.token)}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'فشل في تحميل الامتحان');
+                }
+                
+                const data = await response.json();
+                appState.surveyData = data;
+                appState.currentView = 'registration';
+                render();
+                
+            } catch (error) {
+                console.error('Error fetching survey:', error);
+                appState.error = error.message;
+                appState.currentView = 'error';
+                render();
+            }
+        }
+
+        // ========== بدء الامتحان ==========
+        function handleStartExam(event) {
+            event.preventDefault();
+            
+            const nameInput = document.getElementById('studentName');
+            const emailInput = document.getElementById('studentEmail');
+            
+            appState.studentName = nameInput.value.trim();
+            appState.studentEmail = emailInput.value.trim();
+            
+            if (!appState.studentName) {
+                nameInput.focus();
+                nameInput.style.borderColor = 'var(--error)';
+                setTimeout(() => {
+                    nameInput.style.borderColor = '';
+                }, 2000);
+                return;
+            }
+            
+            appState.startTime = Date.now();
+            
+            if (appState.surveyData.maxTimeToFinish) {
+                appState.timeRemaining = appState.surveyData.maxTimeToFinish;
+            }
+            
+            appState.currentView = 'exam';
+            render();
+        }
+
+        // ========== تقديم الامتحان ==========
+        async function submitExam(answers) {
+            appState.submitting = true;
+            render();
+            
+            const timeSpent = Math.floor((Date.now() - appState.startTime) / 1000);
+            
+            const payload = {
+                exam: appState.examId,
+                token: appState.token,
+                answers: answers,
+                studentName: appState.studentName,
+                studentEmail: appState.studentEmail || null,
+                timeSpent: timeSpent,
+                finishedAt: new Date().toISOString()
+            };
+            
+            // الوضع التجريبي
+            if (appState.examId.toUpperCase() === 'DEMO') {
+                const result = calculateDemoResult(answers, timeSpent);
+                appState.result = result;
+                appState.submitting = false;
+                appState.currentView = 'result';
+                
+                if (appState.timerInterval) {
+                    clearInterval(appState.timerInterval);
+                }
+                
+                render();
+                return;
+            }
+            
+            try {
+                const response = await fetch(getSubmitUrl(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'فشل في تقديم الامتحان');
+                }
+                
+                const result = await response.json();
+                appState.result = result;
+                appState.currentView = 'result';
+                
+            } catch (error) {
+                console.error('Error submitting exam:', error);
+                alert('حدث خطأ أثناء تقديم الامتحان: ' + error.message);
+                appState.submitting = false;
+            }
+            
+            if (appState.timerInterval) {
+                clearInterval(appState.timerInterval);
+            }
+            
+            render();
+        }
+
+        // ========== حساب النتيجة التجريبية ==========
+        function calculateDemoResult(answers, timeSpent) {
+            let totalScore = 0;
+            let maxScore = 0;
+            let correctCount = 0;
+            const detailedResults = [];
+            
+            for (const [qId, correctData] of Object.entries(DEMO_CORRECT_ANSWERS)) {
+                const studentAnswer = answers[qId];
+                maxScore += correctData.points;
+                
+                const isMultipleChoice = Array.isArray(correctData.answer);
+                let isCorrect = false;
+                
+                if (studentAnswer !== undefined && studentAnswer !== null) {
+                    if (isMultipleChoice) {
+                        const studentAnswers = Array.isArray(studentAnswer) ? studentAnswer : [studentAnswer];
+                        const correctAnswers = correctData.answer;
+                        isCorrect = correctAnswers.length === studentAnswers.length &&
+                            correctAnswers.every(a => studentAnswers.includes(a));
+                    } else {
+                        isCorrect = studentAnswer === correctData.answer;
+                    }
+                }
+                
+                if (isCorrect) {
+                    totalScore += correctData.points;
+                    correctCount++;
+                }
+                
+                detailedResults.push({
+                    questionId: qId.replace('q_', ''),
+                    question: correctData.question,
+                    studentAnswer: studentAnswer ?? null,
+                    correctAnswer: correctData.answer,
+                    isCorrect: isCorrect,
+                    score: isCorrect ? correctData.points : 0,
+                    maxScore: correctData.points,
+                    type: isMultipleChoice ? 'checkbox' : 'radiogroup'
+                });
+            }
+            
+            const percentage = maxScore > 0 ? ((totalScore / maxScore) * 100).toFixed(2) : '0';
+            const passed = parseFloat(percentage) >= 60;
+            
+            return {
+                success: true,
+                submissionId: `DEMO_${appState.examId}_${Date.now()}`,
+                examId: appState.examId,
+                studentName: appState.studentName,
+                studentEmail: appState.studentEmail,
+                examInfo: {
+                    title: appState.surveyData.title,
+                    duration: Math.floor((appState.surveyData.maxTimeToFinish || 0) / 60)
+                },
+                results: {
+                    totalScore: totalScore,
+                    maxScore: maxScore,
+                    percentage: percentage,
+                    correctCount: correctCount,
+                    totalQuestions: Object.keys(DEMO_CORRECT_ANSWERS).length,
+                    passed: passed,
+                    grade: passed ? 'Pass' : 'Fail'
+                },
+                detailedResults: detailedResults,
+                timeSpent: timeSpent,
+                submittedAt: new Date().toISOString(),
+                finishedAt: new Date().toISOString()
+            };
+        }
+
+        // ========== بدء التطبيق ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSurvey();
+        });
+    </script>
 </body>
 </html>
