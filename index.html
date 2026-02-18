@@ -7,80 +7,40 @@
     <title>نظام اختبارات بايثون</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
-    <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
+    
+    <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
+    <script src="https://unpkg.com/survey-js-ui/survey-js-ui.min.js"></script>
+    <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root {
-            --bg-primary: #ffffff; /* أبيض صافي */
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f8fafc;
-            --text-primary: #1a2332;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --accent-light: rgba(37, 99, 235, 0.05);
-            --border: #e2e8f0;
-            --shadow: rgba(0, 0, 0, 0.05);
-            --success: #059669;
-            --danger: #dc2626;
+            --bg-primary: #ffffff; --bg-secondary: #ffffff; --bg-tertiary: #f8fafc;
+            --text-primary: #1a2332; --text-secondary: #4a5568; --accent: #2563eb;
+            --accent-hover: #1d4ed8; --border: #e2e8f0; --shadow: rgba(0, 0, 0, 0.05);
         }
         .dark {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --text-primary: #f0f6fc;
-            --text-secondary: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent: #3b82f6;
-            --accent-hover: #58a6ff;
-            --accent-light: rgba(59, 130, 246, 0.12);
-            --border: #30363d;
-            --shadow: rgba(0, 0, 0, 0.4);
+            --bg-primary: #0d1117; --bg-secondary: #161b22; --bg-tertiary: #21262d;
+            --text-primary: #f0f6fc; --text-secondary: #c9d1d9; --accent: #3b82f6;
+            --border: #30363d; --shadow: rgba(0, 0, 0, 0.4);
         }
         * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
         body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; transition: all 0.3s ease; }
-        
-        /* إزالة نمط القماش - الآن خلفية سادة */
-        .bg-clean { position: fixed; inset: 0; z-index: 0; background: var(--bg-primary); }
-
         .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 12px var(--shadow); position: relative; z-index: 10; }
         .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .timer-ring { transform: rotate(-90deg); }
-        .timer-ring-progress { transition: stroke-dashoffset 1s linear; }
-        
-        .input-field {
-            width: 100%; padding: 12px 16px; background: var(--bg-tertiary);
-            border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-        .input-field:focus { outline: none; border-color: var(--accent); ring: 2px var(--accent-light); }
-        
-        .btn-primary {
-            background: var(--accent); color: white; font-weight: 600;
-            padding: 12px 24px; border-radius: 10px; transition: all 0.2s ease;
-        }
+        .input-field { width: 100%; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); }
+        .btn-primary { background: var(--accent); color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: all 0.2s ease; width: 100%; }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-
-        /* SurveyJS Customization */
-        .sd-root-modern { --primary: var(--accent) !important; }
-        .sd-container-modern { padding: 0 !important; }
+        #surveyContainer { min-height: 400px; }
     </style>
 </head>
 <body class="antialiased">
-    <div class="bg-clean"></div>
-
     <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-x-0">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -89,39 +49,33 @@
                 </div>
                 <div>
                     <h1 class="text-base font-bold">Python Quiz</h1>
-                    <p id="header-subtitle" class="text-xs text-gray-500">نظام الاختبارات</p>
+                    <p id="header-subtitle" class="text-xs text-gray-500">نظام الاختبارات الاحترافي</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <div id="timer-wrapper" class="hidden">
-                    <div id="timer-container" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200">
-                        <svg class="timer-ring" width="24" height="24">
-                            <circle stroke="#e2e8f0" stroke-width="2" fill="transparent" r="10" cx="12" cy="12"/>
-                            <circle id="timer-progress" stroke="var(--accent)" stroke-width="2" fill="transparent" r="10" cx="12" cy="12" stroke-dasharray="62.8" stroke-dashoffset="0" stroke-linecap="round"/>
-                        </svg>
-                        <span id="timer-display" class="font-mono font-bold text-sm">00:00</span>
-                    </div>
+                <div id="timer-wrapper" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200">
+                    <i class="fas fa-clock text-blue-600"></i>
+                    <span id="timer-display" class="font-mono font-bold text-sm">00:00</span>
                 </div>
                 <button id="theme-toggle" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50">
-                    <i id="theme-icon" class="fas fa-moon"></i>
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
     </header>
 
     <main class="relative z-10 container mx-auto px-4 pt-24 pb-8">
-        
         <div id="loading-state" class="flex flex-col items-center justify-center min-h-[60vh]">
             <div class="spinner mb-4"></div>
-            <p id="loading-message" class="text-gray-500">جاري الاتصال...</p>
+            <p id="loading-message" class="text-gray-500">جاري الاتصال بالنظام...</p>
         </div>
 
         <div id="error-state" class="hidden max-w-md mx-auto card p-8 text-center">
             <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-bold mb-2">عذراً، حدث خطأ</h2>
             <p id="error-message" class="text-gray-600 mb-6"></p>
-            <button onclick="location.reload()" class="btn-primary w-full">إعادة المحاولة</button>
+            <button onclick="location.reload()" class="btn-primary">إعادة المحاولة</button>
         </div>
 
         <div id="start-form-state" class="hidden max-w-lg mx-auto card p-8">
@@ -136,7 +90,7 @@
                     <label class="block text-sm font-medium mb-1">البريد الإلكتروني</label>
                     <input type="email" id="student-email" class="input-field text-left" placeholder="name@example.com" required>
                 </div>
-                <button type="submit" class="btn-primary w-full mt-4">ابدأ الاختبار الآن</button>
+                <button type="submit" class="btn-primary">ابدأ الاختبار الآن</button>
             </form>
         </div>
 
@@ -145,25 +99,21 @@
         </div>
 
         <div id="success-state" class="hidden max-w-2xl mx-auto card p-8 text-center">
-            <div id="result-icon" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4"></div>
-            <h2 id="result-title" class="text-3xl font-black mb-2"></h2>
-            <p id="result-message" class="text-gray-500 mb-8"></p>
+            <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+            <h2 id="result-title" class="text-3xl font-black mb-2">تم التسليم بنجاح</h2>
+            <p id="result-message" class="text-gray-500 mb-8">لقد تم حفظ إجاباتك في النظام.</p>
             
-            <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="grid grid-cols-2 gap-4 mb-8">
                 <div class="p-4 bg-gray-50 rounded-xl">
-                    <span class="block text-2xl font-bold text-blue-600" id="score-percentage">0%</span>
-                    <span class="text-xs text-gray-400">النسبة</span>
+                    <span class="block text-2xl font-bold text-blue-600" id="res-exam-id">-</span>
+                    <span class="text-xs text-gray-400">معرف الاختبار</span>
                 </div>
                 <div class="p-4 bg-gray-50 rounded-xl">
-                    <span class="block text-2xl font-bold" id="score-value">0</span>
-                    <span class="text-xs text-gray-400">درجتك</span>
-                </div>
-                <div class="p-4 bg-gray-50 rounded-xl">
-                    <span class="block text-2xl font-bold" id="time-spent">0</span>
-                    <span class="text-xs text-gray-400">الدقائق</span>
+                    <span class="block text-2xl font-bold" id="res-time">-</span>
+                    <span class="text-xs text-gray-400">وقت التسليم</span>
                 </div>
             </div>
-            <button onclick="window.print()" class="text-blue-600 font-semibold hover:underline">طباعة التقرير</button>
+            <p class="text-sm text-gray-400">سيتم مراجعة النتائج وإبلاغك بالدرجة لاحقاً.</p>
         </div>
     </main>
 
@@ -175,8 +125,7 @@
 
         const state = {
             examId: '', token: '', examData: null,
-            startTime: null, timerInterval: null,
-            studentName: '', studentEmail: ''
+            startTime: null, timerInterval: null
         };
 
         const DOM = {
@@ -195,12 +144,11 @@
             state.token = urlParams.get('token');
 
             if (!state.examId) {
-                showError("رابط غير صالح", "معرف الاختبار مفقود من الرابط.");
+                showError("الرابط ناقص", "يرجى استخدام رابط الاختبار الصحيح المحتوي على معرف الاختبار.");
                 return;
             }
             fetchSurvey();
             
-            // Theme toggle
             document.getElementById('theme-toggle').onclick = () => {
                 document.documentElement.classList.toggle('dark');
             };
@@ -208,30 +156,25 @@
 
         async function fetchSurvey() {
             try {
-                const res = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam_id=${state.examId}&token=${state.token}`);
-                const data = await res.json();
-                
-                if (data.error || !data.pages || data.pages[0].elements.length === 0) {
-                    throw new Error(data.message || "لا توجد أسئلة متوفرة لهذا الاختبار حالياً.");
-                }
+                const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam_id=${state.examId}&token=${state.token}`);
+                if (!response.ok) throw new Error("فشل الاتصال بـ n8n");
+                const data = await response.json();
                 
                 state.examData = data;
                 showStartForm(data);
             } catch (e) {
-                showError("خطأ في التحميل", e.message);
+                showError("خطأ في جلب البيانات", e.message);
             }
         }
 
         function showStartForm(data) {
             DOM.loadingState.classList.add('hidden');
             DOM.startFormState.classList.remove('hidden');
-            document.getElementById('start-exam-title').textContent = data.title;
-            document.getElementById('start-exam-desc').textContent = `${data.pages[0].elements.length} سؤال | ${data.durationMin || 15} دقيقة`;
+            document.getElementById('start-exam-title').textContent = data.title || "اختبار جديد";
+            document.getElementById('start-exam-desc').textContent = `المدة: ${data.durationMin || 15} دقيقة`;
             
             document.getElementById('student-info-form').onsubmit = (e) => {
                 e.preventDefault();
-                state.studentName = document.getElementById('student-name').value;
-                state.studentEmail = document.getElementById('student-email').value;
                 startExam();
             };
         }
@@ -242,14 +185,18 @@
             DOM.timerWrapper.classList.remove('hidden');
             
             state.startTime = Date.now();
+            
+            // تهيئة نموذج الاختبار
             const survey = new Survey.Model(state.examData);
             survey.locale = 'ar';
             
-            survey.onComplete.add(result => submitAnswers(result.data));
-            
-            // الإصلاح الجوهري هنا
+            // رندرة الاختبار في الصفحة
             survey.render("surveyContainer");
             
+            survey.onComplete.add(result => {
+                submitAnswers(result.data);
+            });
+
             startTimer(state.examData.durationMin || 15);
         }
 
@@ -263,8 +210,8 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(state.timerInterval);
-                    alert("انتهى الوقت! سيتم تسليم الإجابات تلقائياً.");
-                    Survey.getSurveyById("surveyContainer")?.completeLastPage();
+                    alert("انتهى الوقت!");
+                    // الإرسال التلقائي غير مفعل هنا لضمان عدم ضياع البيانات
                 }
             }, 1000);
         }
@@ -273,40 +220,36 @@
             clearInterval(state.timerInterval);
             DOM.surveyWrapper.classList.add('hidden');
             DOM.loadingState.classList.remove('hidden');
-            document.getElementById('loading-message').textContent = "جاري تصحيح الاختبار...";
+            document.getElementById('loading-message').textContent = "جاري إرسال إجاباتك...";
 
             try {
+                const payload = {
+                    exam: state.examId,
+                    token: state.token,
+                    studentName: document.getElementById('student-name').value,
+                    studentEmail: document.getElementById('student-email').value,
+                    answers: answers,
+                    timeSpent: Math.floor((Date.now() - state.startTime) / 1000)
+                };
+
                 const res = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SUBMIT_EXAM}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        exam_id: state.examId,
-                        studentName: state.studentName,
-                        studentEmail: state.studentEmail,
-                        answers: answers
-                    })
+                    body: JSON.stringify(payload)
                 });
-                const result = await res.json();
-                showResult(result);
+
+                if (res.ok) {
+                    DOM.loadingState.classList.add('hidden');
+                    DOM.successState.classList.remove('hidden');
+                    document.getElementById('res-exam-id').textContent = state.examId;
+                    document.getElementById('res-time').textContent = new Date().toLocaleTimeString('ar-EG');
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                } else {
+                    throw new Error("فشل إرسال النتائج للسيرفر");
+                }
             } catch (e) {
-                showError("خطأ في الإرسال", "لم نتمكن من إرسال إجاباتك. يرجى تصوير الشاشة.");
+                showError("خطأ في التسليم", e.message);
             }
-        }
-
-        function showResult(result) {
-            DOM.loadingState.classList.add('hidden');
-            DOM.successState.classList.remove('hidden');
-            DOM.timerWrapper.classList.add('hidden');
-
-            const score = result.score || 0;
-            const max = result.max || 10;
-            const percent = Math.round((score / max) * 100);
-
-            document.getElementById('score-percentage').textContent = percent + '%';
-            document.getElementById('score-value').textContent = score;
-            document.getElementById('result-title').textContent = percent >= 50 ? "مبارك النجاح!" : "حظاً أوفر!";
-            
-            if (percent >= 80) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
         function showError(t, m) {
