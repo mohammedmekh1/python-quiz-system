@@ -93,7 +93,10 @@
           throw new Error("فشل في جلب البيانات من السيرفر. تأكد من صحة التوكن.");
         }
 
-        const surveyData = await response.json();
+        // ← الحل: استخراج أول عنصر إذا كانت البيانات مصفوفة
+        const responseData = await response.json();
+        const surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
+        
         console.log("البيانات المستلمة:", surveyData);
 
         // إخفاء التحميل
