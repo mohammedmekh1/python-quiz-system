@@ -3,20 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="نظام اختبارات بايثون الاحترافي">
-    <title>نظام اختبارات بايثون</title>
+    <meta name="description" content="نظام اختبارات احترافي">
+    <title>نظام الاختبارات</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
-    <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
-    <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
     
+    <!-- SurveyJS Libraries (Knockout Version for full compatibility) -->
+    <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
+    <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
+    <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet"/>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <script>
@@ -36,36 +42,36 @@
     <style>
         /* Light Mode */
         :root {
-            --bg-primary: #f5f7fa;
+            --bg-primary: #ffffff; /* تم التغيير إلى أبيض */
             --bg-secondary: #ffffff;
-            --bg-tertiary: #e8ecf1;
-            --text-primary: #1a2332;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --accent: #2563eb;
+            --bg-tertiary: #f8fafc; /* رمادي فاتح جداً للعناصر الداخلية */
+            --text-primary: #1e3a8a; /* أزرق ملكي للعناوين */
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --accent: #1e3a8a; /* أزرق ملكي */
             --accent-hover: #1d4ed8;
-            --accent-light: rgba(37, 99, 235, 0.08);
-            --border: #d1d9e6;
-            --shadow: rgba(26, 35, 50, 0.08);
+            --accent-light: rgba(30, 58, 138, 0.08);
+            --border: #e2e8f0;
+            --shadow: rgba(30, 58, 138, 0.06);
             --success: #059669;
             --danger: #dc2626;
         }
         
         /* Dark Mode */
         .dark {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --text-primary: #f0f6fc;
-            --text-secondary: #c9d1d9;
-            --text-muted: #8b949e;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
             --accent: #3b82f6;
-            --accent-hover: #58a6ff;
-            --accent-light: rgba(59, 130, 246, 0.12);
-            --border: #30363d;
-            --shadow: rgba(0, 0, 0, 0.4);
-            --success: #3fb950;
-            --danger: #f85149;
+            --accent-hover: #60a5fa;
+            --accent-light: rgba(59, 130, 246, 0.15);
+            --border: #475569;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --success: #34d399;
+            --danger: #f87171;
         }
         
         * {
@@ -75,34 +81,17 @@
         
         body {
             background: var(--bg-primary);
-            color: var(--text-primary);
+            color: var(--text-secondary);
             min-height: 100vh;
             transition: background 0.3s ease, color 0.3s ease;
         }
-        
-        /* Subtle Grid Pattern */
-        .bg-pattern {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background-image: 
-                linear-gradient(var(--border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.3;
-        }
-        
-        .dark .bg-pattern {
-            opacity: 0.1;
-        }
-        
-        /* Card */
+
+        /* Card Style */
         .card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 16px;
-            box-shadow: 0 4px 20px var(--shadow);
+            box-shadow: 0 4px 6px -1px var(--shadow);
         }
         
         /* Loading Spinner */
@@ -115,107 +104,34 @@
             animation: spin 0.8s linear infinite;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Timer Ring */
-        .timer-ring {
-            transform: rotate(-90deg);
-        }
+        /* Timer */
+        .timer-ring { transform: rotate(-90deg); }
+        .timer-ring-bg { stroke: var(--border); }
+        .timer-ring-progress { stroke: var(--accent); transition: stroke-dashoffset 1s linear; }
+        .timer-warning .timer-ring-progress { stroke: var(--danger); }
         
-        .timer-ring-bg {
-            stroke: var(--border);
-        }
-        
-        .timer-ring-progress {
-            stroke: var(--accent);
-            transition: stroke-dashoffset 1s linear;
-        }
-        
-        .timer-warning .timer-ring-progress {
-            stroke: var(--danger);
-        }
-        
-        /* Fade In */
-        .fade-in {
-            animation: fadeIn 0.4s ease forwards;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Pulse */
-        .pulse {
-            animation: pulse 1s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         
         /* Score Circle */
-        .score-circle {
-            position: relative;
-            width: 140px;
-            height: 140px;
-        }
-        
-        .score-circle svg {
-            transform: rotate(-90deg);
-        }
-        
-        .score-circle-bg {
-            fill: none;
-            stroke: var(--border);
-            stroke-width: 10;
-        }
-        
-        .score-circle-progress {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 10;
-            stroke-linecap: round;
-            stroke-dasharray: 377;
-            stroke-dashoffset: 377;
-            transition: stroke-dashoffset 1.2s ease;
-        }
-        
-        .score-value {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+        .score-circle { position: relative; width: 140px; height: 140px; }
+        .score-circle svg { transform: rotate(-90deg); }
+        .score-circle-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+        .score-circle-progress { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 1.2s ease; }
+        .score-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         /* Theme Toggle */
         .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease;
         }
-        
-        .theme-toggle:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
-        }
-        
-        .theme-toggle i {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
+        .theme-toggle:hover { background: var(--accent-light); border-color: var(--accent); }
+        .theme-toggle i { color: var(--text-secondary); font-size: 1rem; }
         
         /* SurveyJS Custom Styles */
         .sd-root-modern {
@@ -227,22 +143,11 @@
             --foreground-light: var(--text-secondary) !important;
             --border: var(--border) !important;
             --corner-radius: 10px !important;
-        }
-        
-        .sd-root-modern .sd-title {
             font-family: 'Cairo', sans-serif !important;
-            color: var(--text-primary) !important;
         }
         
-        .sd-root-modern .sd-description {
-            color: var(--text-secondary) !important;
-        }
-        
-        .sd-root-modern .sd-question__title {
-            font-family: 'Cairo', sans-serif !important;
-            font-weight: 600 !important;
-            color: var(--text-primary) !important;
-        }
+        .sd-root-modern .sd-title { color: var(--text-primary) !important; font-weight: 700 !important; }
+        .sd-root-modern .sd-question__title { font-weight: 600 !important; color: var(--text-primary) !important; font-size: 1.05rem !important; line-height: 1.6 !important; }
         
         .sd-root-modern .sd-item {
             background: var(--bg-tertiary) !important;
@@ -252,20 +157,9 @@
             margin-bottom: 8px !important;
             transition: all 0.2s ease !important;
         }
-        
-        .sd-root-modern .sd-item:hover {
-            border-color: var(--accent) !important;
-        }
-        
-        .sd-root-modern .sd-item--checked {
-            border-color: var(--accent) !important;
-            background: var(--accent-light) !important;
-        }
-        
-        .sd-root-modern .sd-item__control-label {
-            color: var(--text-primary) !important;
-            font-family: 'Cairo', sans-serif !important;
-        }
+        .sd-root-modern .sd-item:hover { border-color: var(--accent) !important; }
+        .sd-root-modern .sd-item--checked { border-color: var(--accent) !important; background: var(--accent-light) !important; }
+        .sd-root-modern .sd-item__control-label { color: var(--text-primary) !important; font-family: 'Cairo', sans-serif !important; }
         
         .sd-root-modern .sd-btn {
             background: var(--accent) !important;
@@ -277,45 +171,15 @@
             border: none !important;
             transition: all 0.2s ease !important;
         }
+        .sd-root-modern .sd-btn:hover { background: var(--accent-hover) !important; transform: translateY(-1px); }
+        .sd-root-modern .sd-navigation__complete-btn { background: var(--success) !important; }
         
-        .sd-root-modern .sd-btn:hover {
-            background: var(--accent-hover) !important;
-            transform: translateY(-1px);
-        }
+        .sd-root-modern .sd-body, .sd-root-modern .sd-page, .sd-root-modern .sd-panel { background: transparent !important; }
+        .sd-root-modern .sd-question { padding: 0 !important; }
+        .sd-root-modern .sd-selectbase { padding: 0 !important; border: none !important; }
         
-        .sd-root-modern .sd-navigation__complete-btn {
-            background: var(--success) !important;
-        }
-        
-        .sd-root-modern .sd-body,
-        .sd-root-modern .sd-page,
-        .sd-root-modern .sd-panel {
-            background: transparent !important;
-        }
-        
-        .sd-root-modern .sd-question {
-            padding: 0 !important;
-        }
-        
-        .sd-root-modern .sd-selectbase {
-            padding: 0 !important;
-            border: none !important;
-        }
-        
-        .sd-root-modern .sd-progress-buttons {
-            background: var(--bg-tertiary) !important;
-            border-radius: 10px !important;
-            padding: 8px !important;
-        }
-        
-        .sd-root-modern pre {
-            background: var(--bg-primary) !important;
-            border-radius: 8px !important;
-            padding: 14px !important;
-            direction: ltr !important;
-            text-align: left !important;
-            font-family: 'JetBrains Mono', monospace !important;
-        }
+        .sd-root-modern .sd-progress-buttons { background: var(--bg-tertiary) !important; border-radius: 10px !important; padding: 8px !important; }
+        .sd-root-modern pre { background: var(--bg-primary) !important; border-radius: 8px !important; padding: 14px !important; direction: ltr !important; text-align: left !important; font-family: 'JetBrains Mono', monospace !important; }
         
         /* Stat Card */
         .stat-card {
@@ -327,47 +191,24 @@
         }
         
         /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-        
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
 </head>
 <body class="antialiased">
-    <!-- Background Pattern -->
-    <div class="bg-pattern"></div>
 
     <!-- Header -->
     <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-l-0 border-r-0">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--accent);">
-                    <i class="fab fa-python text-white text-lg"></i>
+                    <i class="fas fa-graduation-cap text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-base font-bold" style="color: var(--text-primary);">Python Quiz</h1>
-                    <p id="header-subtitle" class="text-xs" style="color: var(--text-muted);">نظام الاختبارات</p>
+                    <h1 class="text-base font-bold" style="color: var(--text-primary);">نظام الاختبارات</h1>
+                    <p id="header-subtitle" class="text-xs" style="color: var(--text-muted);">اللوحة الرئيسية</p>
                 </div>
             </div>
             
@@ -463,9 +304,7 @@
         <div id="success-state" class="hidden">
             <div class="max-w-xl mx-auto">
                 <div class="card p-6 text-center fade-in">
-                    <!-- Result Icon -->
                     <div id="result-icon" class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"></div>
-                    
                     <h2 id="result-title" class="text-2xl font-bold mb-1" style="color: var(--text-primary);"></h2>
                     <p id="result-message" class="mb-6" style="color: var(--text-secondary);"></p>
 
@@ -499,7 +338,6 @@
                         </div>
                     </div>
 
-                    <!-- Actions -->
                     <div class="flex justify-center">
                         <button onclick="window.print()" class="px-6 py-2 rounded-lg font-semibold" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border);">
                             <i class="fas fa-print ml-2"></i>
@@ -514,7 +352,7 @@
     <!-- Footer -->
     <footer class="relative z-10 card mt-8 rounded-none border-b-0 border-l-0 border-r-0 py-3">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-xs" style="color: var(--text-muted);">Python Quiz System - جميع الحقوق محفوظة</p>
+            <p class="text-xs" style="color: var(--text-muted);">نظام الاختبارات الاحترافي - جميع الحقوق محفوظة</p>
         </div>
     </footer>
 
@@ -636,7 +474,6 @@
                 }
 
                 const data = await response.json();
-
                 if (data.error || data.success === false) {
                     throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
                 }
@@ -655,7 +492,17 @@
             DOM.headerSubtitle.textContent = data.title || 'نظام الاختبارات';
             DOM.examDescription.textContent = data.description || '';
             
-            const questionsLength = data.pages?.[0]?.elements?.length || 0;
+            // معالجة البيانات: تقسيم الأسئلة لصفحات منفصلة لظهور الأزرار
+            if (data.pages && data.pages.length === 1 && data.pages[0].elements && data.pages[0].elements.length > 1) {
+               const questions = data.pages[0].elements;
+               const newPages = questions.map((q, index) => ({
+                 name: "page" + index,
+                 elements: [q]
+               }));
+               data.pages = newPages;
+            }
+
+            const questionsLength = data.pages?.reduce((acc, page) => acc + (page.elements?.length || 0), 0) || 0;
             DOM.questionsCount.textContent = questionsLength;
             
             const durationMin = parseInt(data.durationMin || data.duration_min || 15);
@@ -680,7 +527,8 @@
                 submitExam(sender.data);
             });
 
-            DOM.surveyContainer.appendChild(state.survey.render());
+            // استخدام render للمكتبة الصحيحة (Knockout)
+            state.survey.render(DOM.surveyContainer);
         }
 
         // ===== Timer =====
@@ -756,6 +604,7 @@
 
             } catch (error) {
                 console.error('Submit Error:', error);
+                // عرض النجاح حتى لو فشل الإرسال لتجنب تعليق المستخدم
                 showSuccess({ score: 0, max: 0 });
             }
         }
@@ -785,7 +634,7 @@
                 resultIcon.innerHTML = '<i class="fas fa-trophy text-4xl" style="color: #f59e0b;"></i>';
                 resultIcon.style.background = 'rgba(245, 158, 11, 0.15)';
                 resultTitle.textContent = 'ممتاز!';
-                resultMessage.textContent = 'أداء رائع! أنت متقدم في بايثون';
+                resultMessage.textContent = 'أداء رائع! أنت متقدم';
                 celebrateSuccess();
             } else if (percentage >= 60) {
                 resultIcon.innerHTML = '<i class="fas fa-thumbs-up text-4xl" style="color: var(--success);"></i>';
@@ -820,7 +669,7 @@
                     particleCount: 80,
                     spread: 60,
                     origin: { y: 0.6 },
-                    colors: ['#2563eb', '#059669', '#f59e0b']
+                    colors: ['#1e3a8a', '#059669', '#f59e0b'] // ألوان متوافقة مع الأزرق الملكي
                 });
             }
         }
