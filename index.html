@@ -3,63 +3,290 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>نظام الاختبارات</title>
+  <title>نظام الاختبارات المتقدم</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- الخطوط -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
-  <!-- 1. مكتبة Knockout (ضرورية لعمل النسخة العادية من SurveyJS) -->
+  <!-- أيقونات (للوضع الليلي والشعار) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- SurveyJS Libraries -->
   <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
-  
-  <!-- 2. مكتبة SurveyJS (نسخة Knockout) -->
   <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet" />
   <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
-  
-  <!-- 3. ملفات اللغة (اختياري لدعم العربية) -->
   <script src="https://unpkg.com/survey-knockout@1.9.120/survey.locales.min.js"></script>
 
   <style>
-    body { font-family: 'Cairo', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; direction: rtl; }
-    .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    h1 { color: #1e3a8a; text-align: center; margin-bottom: 30px; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-    button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 500px; }
+    :root {
+      /* متغيرات الألوان - أزرق ملكي */
+      --primary-color: #1e3a8a; /* Royal Blue */
+      --primary-light: #3b82f6;
+      --primary-dark: #1e40af;
+      --accent-color: #f59e0b; /* ذهبي للأكسنت */
+      
+      /* خلفيات الوضع الفاتح */
+      --bg-main: #f3f4f6;
+      --bg-card: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      
+      /* ألوان SurveyJS */
+      --sjs-primary: var(--primary-color);
+      --sjs-primary-fore: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      /* متغيرات الوضع الليلي */
+      --bg-main: #111827;
+      --bg-card: #1f2937;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-color: #374151;
+      
+      --primary-color: #3b82f6;
+      --primary-dark: #2563eb;
+    }
+
+    * { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
     
-    /* تنسيقات الحالة */
-    .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 20px; border-radius: 8px; }
-    #loading { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-    #error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg-main);
+      margin: 0;
+      padding: 0;
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    /* --- الهيدر والشعار --- */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 15px 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 45px;
+      height: 45px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+      font-size: 22px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .site-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    /* زر الوضع الليلي */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+
+    /* --- الحاوية الرئيسية --- */
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: var(--bg-card);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    h1 { color: var(--primary-color); text-align: center; margin-bottom: 30px; font-weight: 900; font-size: 2rem; }
     
-    /* دعم RTL لـ SurveyJS */
-    .sd-root-modern { direction: rtl !important; text-align: right; }
-    .sd-body { direction: rtl !important; }
+    .form-group { margin-bottom: 25px; }
+    label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+    
+    input {
+      width: 100%; padding: 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+    }
+    input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+
+    button.main-btn {
+      width: 100%;
+      background: linear-gradient(to left, var(--primary-color), var(--primary-light));
+      color: white;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+    }
+    button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4); }
+
+    /* --- تنسيق SurveyJS --- */
+    #surveyContainer { margin-top: 10px; }
+    
+    /* إجبار SurveyJS على استخدام خط Cairo وألوان Royal Blue */
+    .sd-root-modern {
+      font-family: 'Cairo', sans-serif !important;
+      color: var(--text-main) !important;
+    }
+    
+    /* خلفية بطاقة السؤال */
+    .sd-page {
+      background: var(--bg-main) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 12px !important;
+      padding: 30px !important;
+      margin-bottom: 20px;
+    }
+
+    /* نص السؤال */
+    .sd-title { font-weight: 800 !important; color: var(--text-main) !important; font-size: 1.1rem !important; }
+
+    /* الأزرار (التالي/السابق/إنهاء) */
+    .sd-btn {
+      background: var(--primary-color) !important;
+      color: white !important;
+      font-family: 'Cairo', sans-serif !important;
+      font-weight: 700 !important;
+      border-radius: 8px !important;
+      padding: 10px 30px !important;
+      border: none !important;
+      font-size: 16px !important;
+    }
+    .sd-btn:hover { background: var(--primary-dark) !important; }
+    
+    /* زر الإنهاء بلون مختلف */
+    .sd-navigation__complete-btn { background: #16a34a !important; }
+    
+    /* شريط التقدم */
+    .sd-progress { background: var(--border-color) !important; height: 8px !important; border-radius: 4px; }
+    .sd-progress__bar { background: var(--primary-color) !important; border-radius: 4px; }
+
+    /* حالة التحميل والخطأ */
+    .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 25px; border-radius: 12px; }
+    #loading { background: #eff6ff; color: #1e40af; }
+    #error { background: #fef2f2; color: #b91c1c; }
+    
+    /* تذييل الصفحة */
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- الهيدر -->
+  <header>
+    <div class="header-content">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h2 class="site-title">منصة الاختبارات</h2>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- المحتوى -->
   <div class="container">
-    <h1 id="mainTitle">اختبار</h1>
+    <h1 id="mainTitle">بدء الاختبار</h1>
     
     <div id="studentForm">
       <div class="form-group">
         <label>الاسم الكامل</label>
-        <input type="text" id="studentName" placeholder="اكتب اسمك هنا" required />
+        <input type="text" id="studentName" placeholder="يرجى كتابة اسمك الثلاثي" required />
       </div>
       <div class="form-group">
         <label>البريد الإلكتروني</label>
         <input type="email" id="studentEmail" placeholder="example@domain.com" required />
       </div>
-      <button onclick="startExam()">ابدأ الاختبار الآن</button>
+      <button class="main-btn" onclick="startExam()">
+        <i class="fas fa-play-circle" style="margin-left: 8px;"></i> ابدأ الاختبار الآن
+      </button>
     </div>
 
-    <div id="loading" class="status-box" style="display:none;">جاري التحميل...</div>
+    <div id="loading" class="status-box" style="display:none;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+      جاري تحميل الأسئلة...
+    </div>
+    
     <div id="error" class="status-box" style="display:none;"></div>
     <div id="surveyContainer"></div>
   </div>
 
+  <footer>
+    جميع الحقوق محفوظة &copy; 2024 - نظام إدارة الاختبارات
+  </footer>
+
   <script>
+    // --- منطق الوضع الليلي ---
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('themeIcon');
+      if (body.getAttribute('data-theme') === 'dark') {
+        body.removeAttribute('data-theme');
+        icon.className = 'fas fa-moon';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        icon.className = 'fas fa-sun';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    // تحميل التفضيل المحفوظ
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.setAttribute('data-theme', 'dark');
+      document.getElementById('themeIcon').className = 'fas fa-sun';
+    }
+
+    // --- منطق الاختبار ---
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
     
@@ -71,38 +298,35 @@
       const name = document.getElementById('studentName').value.trim();
       const email = document.getElementById('studentEmail').value.trim();
 
-      // تحقق بسيط من الإيميل
       if (!name || !email.includes('@')) {
         alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
         return;
       }
 
       if (!examId || !token) {
-        alert('خطأ: معرف الاختبار أو التوكن مفقود');
+        alert('خطأ: الرابط غير مكتمل (توكن أو معرف الاختبار مفقود)');
         return;
       }
 
       document.getElementById('studentForm').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
-      document.getElementById('error').style.display = 'none';
+      document.getElementById('mainTitle').textContent = "جاري التحميل...";
 
       try {
         const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
         
         const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error("فشل في جلب البيانات");
+        if (!response.ok) throw new Error("فشل الاتصال بالخادم");
         
         const responseData = await response.json();
         let surveyJson = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        // تنظيف البيانات الواردة
+        // 1. تنظيف البيانات (أمان وإصلاحات)
         if (surveyJson.pages) {
           surveyJson.pages.forEach(page => {
             if (page.elements) {
               page.elements.forEach(q => {
-                // إزالة الإجابات الصحيحة للأمان
                 if (q.correctAnswer) delete q.correctAnswer;
-                // إصلاح الخيارات الفارغة
                 if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
                   q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
                 }
@@ -111,24 +335,44 @@
           });
         }
 
-        // تعطيل صفحة البداية إذا كانت مفعلة لمنع مشاكل العرض
-        if (surveyJson.firstPageIsStarted) {
-          surveyJson.firstPageIsStarted = false;
+        // 2. حل مشكلة "ظهور الأسئلة تحت بعضها": نقسم الأسئلة إلى صفحات
+        // إذا كان هناك صفحة واحدة تحوي عدة أسئلة، سنحولها إلى صفحات منفصلة
+        if (surveyJson.pages && surveyJson.pages.length === 1 && surveyJson.pages[0].elements && surveyJson.pages[0].elements.length > 1) {
+           const questions = surveyJson.pages[0].elements;
+           const newPages = questions.map((q, index) => ({
+             name: "page" + index,
+             elements: [q]
+           }));
+           surveyJson.pages = newPages;
         }
         
         document.getElementById('loading').style.display = 'none';
+        document.getElementById('mainTitle').textContent = "الاختبار";
 
-        // إنشاء النموذج
+        // 3. إعداد النموذج
         const survey = new Survey.Model(surveyJson);
-        survey.locale = "ar"; // تعيين اللغة العربية
-        survey.showNavigationButtons = true;
-        survey.showProgressBar = "top";
+        survey.locale = "ar";
         
-        // عرض النموذج في الحاوية
+        // إجبار إظهار أزرار التنقل
+        survey.showNavigationButtons = true; 
+        survey.showProgressBar = "top";
+        survey.showTitle = false; // نستخدم العنوان الخاص بنا
+
+        // تطبيق خصائص RTL
+        survey.onAfterRenderPage.add(() => {
+           // يمكن إضافة تعديلات إضافية هنا إذا لزم الأمر
+        });
+
         survey.render("surveyContainer");
 
-        // عند الانتهاء من الاختبار
+        // 4. عند الإرسال
         survey.onComplete.add(async (sender) => {
+          document.getElementById("surveyContainer").innerHTML = `
+            <div class="status-box" style="background:#ecfdf5; color:#065f46;">
+              <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:10px;"></i><br>
+              جاري إرسال إجاباتك...
+            </div>`;
+
           const results = {
             exam: examId,
             token: token,
@@ -139,28 +383,28 @@
           };
 
           try {
-            const postResponse = await fetch(POST_URL, {
+            await fetch(POST_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(results)
             });
-            
-            if(postResponse.ok) {
-              document.getElementById("surveyContainer").innerHTML = "<div class='status-box' style='background:#e8f5e9; color:#2e7d32;'>تم إرسال الإجابات بنجاح!</div>";
-            } else {
-              throw new Error("فشل الإرسال");
-            }
+            document.getElementById("surveyContainer").innerHTML = `
+              <div class="status-box" style="background:#ecfdf5; color:#065f46;">
+                <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:10px;"></i><br>
+                <h2>تم بنجاح!</h2>
+                <p>شكراً لك، تم إرسال إجاباتك بنجاح.</p>
+              </div>`;
           } catch (e) {
-            document.getElementById('error').textContent = "حدث خطأ أثناء إرسال الإجابات.";
             document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = "حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً.";
             console.error(e);
           }
         });
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
+        document.getElementById('error').innerHTML = `<i class="fas fa-exclamation-triangle"></i> خطأ: ${err.message}`;
         console.error(err);
       }
     }
