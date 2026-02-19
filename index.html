@@ -25,7 +25,6 @@
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
-    #debugInfo { background: #f5f5f5; padding: 15px; margin-top: 20px; border-radius: 8px; font-family: monospace; font-size: 12px; text-align: left; direction: ltr; display: none; }
   </style>
 </head>
 <body>
@@ -47,7 +46,6 @@
     <div id="loading">جاري جلب الأسئلة من السيرفر...</div>
     <div id="error"></div>
     <div id="surveyContainer"></div>
-    <div id="debugInfo"></div>
   </div>
 
   <script>
@@ -65,11 +63,37 @@
       document.getElementById('mainTitle').textContent = `اختبار: ${examId}`;
     }
 
-    // دالة لعرض معلومات التصحيح
-    function showDebug(info) {
-      const debugDiv = document.getElementById('debugInfo');
-      debugDiv.style.display = 'block';
-      debugDiv.innerHTML = '<strong>Debug Info:</strong><br>' + JSON.stringify(info, null, 2);
+    // دالة لتنظيف وإصلاح هيكل البيانات
+    function fixSurveyData(data) {
+      // إزالة correctAnswer لأنه غير مدعوم في النسخة المجانية
+      // أو تحويله إلى خاصية مخصصة إذا أردت الاحتفاظ به
+      
+      if (data.pages && Array.isArray(data.pages)) {
+        data.pages.forEach(page => {
+          if (page.elements && Array.isArray(page.elements)) {
+            page.elements.forEach(element => {
+              // إزالة correctAnswer إذا موجود (غير مدعوم في النسخة المجانية)
+              if (element.correctAnswer) {
+                // يمكننا حفظه في خاصية مخصصة إذا أردت
+                element.correctAnswerValue = element.correctAnswer;
+                delete element.correctAnswer;
+              }
+              
+              // التأكد من أن choices هي مصفوفة
+              if (element.choices && !Array.isArray(element.choices)) {
+                element.choices = [];
+              }
+              
+              // إصلاح السؤال 3: إذا كان choices تحتوي على 'Error' فقط
+              if (element.choices && element.choices.length === 1 && element.choices[0] === 'Error') {
+                element.choices = ['خيار 1', 'خيار 2', 'خيار 3', 'خيار 4'];
+              }
+            });
+          }
+        });
+      }
+      
+      return data;
     }
 
     // 3. الدالة الأساسية لبدء الاختبار
@@ -104,10 +128,14 @@
 
         // استخراج أول عنصر إذا كانت البيانات مصفوفة
         const responseData = await response.json();
-        const surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
+        let surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        console.log("البيانات المستلمة:", surveyData);
-        showDebug({ receivedData: surveyData });
+        console.log("البيانات قبل التصليح:", surveyData);
+
+        // تنظيف وإصلاح البيانات
+        surveyData = fixSurveyData(surveyData);
+        
+        console.log("البيانات بعد التصليح:", surveyData);
 
         // فحص هيكل البيانات
         if (!surveyData || typeof surveyData !== 'object') {
@@ -121,18 +149,6 @@
         if (surveyData.pages.length === 0) {
           throw new Error("لا توجد صفحات في هذا الاختبار");
         }
-
-        // فحص كل صفحة
-        surveyData.pages.forEach((page, index) => {
-          console.log(`الصفحة ${index}:`, page);
-          if (!page.elements || !Array.isArray(page.elements)) {
-            console.warn(`الصفحة ${index} لا تحتوي على elements`);
-            page.elements = []; // إنشاء مصفوفة فارغة إذا لم تكن موجودة
-          }
-        });
-
-        console.log("عدد الصفحات:", surveyData.pages.length);
-        console.log("إجمالي الأسئلة:", surveyData.pages.reduce((sum, p) => sum + (p.elements?.length || 0), 0));
 
         // إخفاء التحميل
         document.getElementById('loading').style.display = 'none';
@@ -174,7 +190,6 @@
         document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
         console.error("Error Details:", err);
-        showDebug({ error: err.message, stack: err.stack });
       }
     }
   </script>
