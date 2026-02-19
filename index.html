@@ -7,10 +7,11 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- SurveyJS (تم التحديث لإصدار أحدث لضمان التوافق) -->
-  <link href="https://unpkg.com/survey-core@1.12.0/defaultV2.min.css" rel="stylesheet" />
-  <script src="https://unpkg.com/survey-core@1.12.0/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-core@1.12.0/survey.i18n.min.js"></script>
+  <!-- SurveyJS (تم التصحيح) -->
+  <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet" />
+  <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
+  <!-- ملف اللغة العربية -->
+  <script src="https://unpkg.com/survey-knockout@1.9.120/survey.locales.min.js"></script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; direction: rtl; }
@@ -22,19 +23,12 @@
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
     #surveyContainer { margin-top: 30px; min-height: 500px; }
+    #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
+    #error { color: #d32f2f; font-weight: bold; }
+    #loading { color: #1e3a8a; }
     
-    /* تحسينات رسائل الحالة */
-    .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 20px; border-radius: 8px; }
-    #error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
-    #loading { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-    
-    /* مؤشر تحميل بسيط */
-    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1e3a8a; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* تنسيق SurveyJS RTL */
+    /* تنسيق RTL */
     .sd-root-modern { direction: rtl !important; text-align: right; }
-    .sd-body { direction: rtl !important; }
   </style>
 </head>
 <body>
@@ -53,13 +47,8 @@
       <button onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
 
-    <div id="loading" class="status-box" style="display:none;">
-        <div class="spinner"></div>
-        جاري تحميل الاختبار...
-    </div>
-    
-    <div id="error" class="status-box" style="display:none;"></div>
-    
+    <div id="loading">جاري التحميل...</div>
+    <div id="error"></div>
     <div id="surveyContainer"></div>
   </div>
 
@@ -71,67 +60,63 @@
     const examId = urlParams.get('exam');
     const token = urlParams.get('token');
 
-    // التحقق المبدئي من الرابط
-    if (!examId || !token) {
-        document.getElementById('studentForm').innerHTML = '<div class="status-box" style="background:#ffebee; color:#c62828;">رابط الاختبار غير صالح أو مفقود. يرجى التأكد من الرابط المرسل إليك.</div>';
-    }
-
     async function startExam() {
       const name = document.getElementById('studentName').value.trim();
       const email = document.getElementById('studentEmail').value.trim();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (!name || !emailRegex.test(email)) {
+      if (!name || !email.includes('@')) {
         alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
+        return;
+      }
+
+      if (!examId || !token) {
+        alert('خطأ: معرف الاختبار أو التوكن مفقود');
         return;
       }
 
       document.getElementById('studentForm').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
-      document.getElementById('error').style.display = 'none';
 
       try {
         const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
         
         const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error("فشل في الاتصال بالخادم");
+        if (!response.ok) throw new Error("فشل في جلب البيانات");
         
         const responseData = await response.json();
         let surveyJson = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        // معالجة البيانات
+        // تنظيف البيانات
         if (surveyJson.pages) {
           surveyJson.pages.forEach(page => {
             if (page.elements) {
               page.elements.forEach(q => {
-                if (q.correctAnswer) delete q.correctAnswer; // أمان
+                if (q.correctAnswer) delete q.correctAnswer;
                 if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
-                  q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د']; // حماية من الخطأ
+                  q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
                 }
               });
             }
           });
         }
-
-        // تعطيل صفحة البداية التلقائية لتجنب مشاكل العرض
+        
         if (surveyJson.firstPageIsStarted) {
           surveyJson.firstPageIsStarted = false;
         }
         
         document.getElementById('loading').style.display = 'none';
 
+        // تهيئة النموذج
         const survey = new Survey.Model(surveyJson);
         survey.locale = "ar";
         survey.showNavigationButtons = true;
         survey.showProgressBar = "top";
         
-        const container = document.getElementById('surveyContainer');
-        survey.render(container);
+        // العرض
+        survey.render("surveyContainer");
 
         // عند الإكمال
         survey.onComplete.add(async (sender) => {
-          container.innerHTML = '<div class="status-box" style="background:#e8f5e9; color:#2e7d32;">جاري إرسال إجاباتك...</div>';
-          
           const results = {
             exam: examId,
             token: token,
@@ -142,26 +127,21 @@
           };
 
           try {
-            const postResponse = await fetch(POST_URL, {
+            await fetch(POST_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(results)
             });
-            
-            if(postResponse.ok) {
-                container.innerHTML = '<div class="status-box" style="background:#e8f5e9; color:#2e7d32; font-size:22px;">تم إرسال الإجابات بنجاح! شكراً لمشاركتك.</div>';
-            } else {
-                throw new Error("خطأ في الإرسال");
-            }
+            document.getElementById("surveyContainer").innerHTML = "<div style='text-align:center; padding:40px; color:green; font-size:20px;'>تم إرسال الإجابات بنجاح!</div>";
           } catch (e) {
-            container.innerHTML = '<div class="status-box" id="error" style="display:block;">حدث خطأ أثناء إرسال الإجابات، يرجى التواصل مع الدعم.</div>';
-            console.error(e);
+            console.error("خطأ في الإرسال:", e);
+            alert("حدث خطأ أثناء إرسال الإجابات.");
           }
         });
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = "حدث خطأ في تحميل الاختبار: " + err.message;
+        document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
         console.error(err);
       }
