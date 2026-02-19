@@ -11,10 +11,10 @@
   <!-- أيقونات -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- مكتبة Confetti للاحتفال بالإنجاز -->
+  <!-- مكتبة Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- SurveyJS Libraries (النسخة الصحيحة التي تعمل) -->
+  <!-- SurveyJS Libraries -->
   <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
   <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet" />
   <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
@@ -56,12 +56,13 @@
       min-height: 100vh;
     }
 
-    /* --- الهيدر --- */
+    /* --- الهيدر (معدل إلى الأبيض/النيوترال) --- */
     header {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: white;
+      background: var(--bg-card); /* خلفية بيضاء بدلاً من الأزرق */
+      color: var(--text-main);
       padding: 15px 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -79,22 +80,22 @@
 
     .logo-icon {
       width: 45px; height: 45px;
-      background: white;
+      background: var(--primary-color); /* الأيقونة زرقاء */
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--primary-color);
+      color: white; /* لون الأيقونة أبيض */
       font-size: 22px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(30, 58, 138, 0.2);
     }
 
-    .site-title { font-size: 1.4rem; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
+    .site-title { font-size: 1.4rem; font-weight: 900; margin: 0; letter-spacing: -0.5px; color: var(--primary-color); }
 
     .theme-toggle {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
       width: 45px; height: 45px;
       border-radius: 50%;
       cursor: pointer;
@@ -103,7 +104,7 @@
       align-items: center;
       justify-content: center;
     }
-    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+    .theme-toggle:hover { background: var(--border-color); color: var(--text-main); }
 
     /* --- الحاوية --- */
     .container {
@@ -165,6 +166,7 @@
 
     .sd-title { font-weight: 800 !important; color: var(--text-main) !important; font-size: 1.1rem !important; }
 
+    /* الأزرار (أزرق ملكي بدل الأخضر) */
     .sd-btn {
       background: var(--primary-color) !important;
       color: white !important;
@@ -176,21 +178,39 @@
       font-size: 16px !important;
     }
     .sd-btn:hover { background: var(--primary-dark) !important; }
-    .sd-navigation__complete-btn { background: #16a34a !important; }
     
+    /* زر الإنهاء أصبح أزرق أيضاً كما طلب */
+    .sd-navigation__complete-btn { background: var(--primary-dark) !important; }
+    
+    /* --- تعديل مسافة الأزرار (السابق/التالي) --- */
+    .sd-body__navigation {
+        display: flex;
+        justify-content: space-between; /* تفريق الأزرار */
+        gap: 20px; /* مسافة بين الأزرار */
+        margin-top: 20px;
+    }
+    
+    /* في حال كان زر واحد فقط (البداية أو النهاية) يتم توسيطه أو جعله بعرض كامل حسب الحاجة */
+    .sd-body__navigation .sd-btn {
+        flex-grow: 0; /* لمنع الزر من أخذ كل العرض */
+        min-width: 140px;
+    }
+    .sd-action-bar {
+        justify-content: center !important;
+        gap: 20px !important;
+    }
+
+    /* شريط التقدم */
     .sd-progress { background: var(--border-color) !important; height: 8px !important; border-radius: 4px; }
     .sd-progress__bar { background: var(--primary-color) !important; border-radius: 4px; }
 
-    /* --- حالات العرض --- */
+    /* حالات العرض */
     .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 25px; border-radius: 12px; }
     #loading { background: #eff6ff; color: #1e40af; }
     #error { background: #fef2f2; color: #b91c1c; }
 
     /* شاشة النجاح */
-    .success-card {
-      text-align: center;
-      padding: 40px 20px;
-    }
+    .success-card { text-align: center; padding: 40px 20px; }
     .checkmark-icon {
       width: 80px; height: 80px;
       background: #dcfce7;
@@ -211,8 +231,8 @@
     .score-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
     /* المؤقت */
-    .timer-header { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; }
-    .timer-text { font-size: 1.1rem; font-weight: 700; font-family: 'Cairo', sans-serif; }
+    .timer-header { display: flex; align-items: center; gap: 10px; background: var(--bg-main); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .timer-text { font-size: 1.1rem; font-weight: 700; font-family: 'Cairo', sans-serif; color: var(--text-main); }
     
     footer { text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; }
   </style>
@@ -230,7 +250,7 @@
       <div class="flex items-center gap-4">
         <!-- المؤقت -->
         <div id="timerBox" class="timer-header hidden">
-            <i class="fas fa-clock"></i>
+            <i class="fas fa-clock" style="color: var(--primary-color);"></i>
             <span id="timerDisplay" class="timer-text">00:00</span>
         </div>
 
@@ -282,8 +302,10 @@
     // --- إعدادات ---
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
+    
     let timerInterval;
     let timeRemaining = 0;
+    let startTime = null; // لتسجيل وقت البداية
 
     // --- الوضع الليلي ---
     function toggleTheme() {
@@ -350,7 +372,7 @@
           });
         }
 
-        // تقسيم الأسئلة لصفحات (لإظهار أزرار التالي/السابق)
+        // تقسيم الأسئلة لصفحات
         if (surveyJson.pages && surveyJson.pages.length === 1 && surveyJson.pages[0].elements && surveyJson.pages[0].elements.length > 1) {
            const questions = surveyJson.pages[0].elements;
            const newPages = questions.map((q, index) => ({
@@ -363,8 +385,9 @@
         document.getElementById('loading').style.display = 'none';
         document.getElementById('mainTitle').textContent = surveyJson.title || "الاختبار";
 
-        // تشغيل المؤقت
-        const duration = surveyJson.durationMin || 15; // قيمة افتراضية 15 دقيقة
+        // تشغيل المؤقت وتسجيل وقت البداية
+        startTime = Date.now(); 
+        const duration = surveyJson.durationMin || 15;
         startTimer(duration);
 
         // إعداد النموذج
@@ -383,19 +406,23 @@
           clearInterval(timerInterval);
           document.getElementById('timerBox').classList.add('hidden');
           
-          // عرض رسالة إرسال مؤقتة
           document.getElementById("surveyContainer").innerHTML = `
              <div class="status-box" style="background:#eff6ff; color:#1e40af;">
                 <i class="fas fa-paper-plane fa-spin" style="font-size:30px; margin-bottom:10px;"></i><br>
-                جاري إرسال الإجابات...
+                جاري تصحيح الإجابات وحفظ النتيجة...
              </div>`;
 
+          // حساب الوقت المستغرق بالثواني
+          const timeSpent = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+
+          // تكامل مع Workflow: إرسال الحقول المطلوبة بالضبط
           const results = {
             exam: examId,
             token: token,
             studentName: name,
             studentEmail: email,
             answers: sender.data,
+            timeSpent: timeSpent,
             finishedAt: new Date().toISOString()
           };
 
@@ -405,10 +432,20 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(results)
             });
+            
             const resData = await postRes.json();
-            showSuccessScreen(resData);
+            
+            // التعامل مع هيكل الرد القادم من n8n
+            // الرد يحتوي على كائن results بداخله totalScore و maxScore
+            if (resData.results) {
+                showSuccessScreen(resData);
+            } else {
+                // حالة لم يتم فيها التصحيح بشكل صحيح
+                showSuccessScreen({ results: { totalScore: 0, maxScore: 100, passed: false } });
+            }
 
           } catch (e) {
+            console.error(e);
             document.getElementById('error').style.display = 'block';
             document.getElementById('error').textContent = "حدث خطأ أثناء الإرسال.";
           }
@@ -430,7 +467,6 @@
         updateTimerDisplay();
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
-          // إجبار الإنهاء عند انتهاء الوقت
           if (window.survey) window.survey.completeLastPage();
         }
       }, 1000);
@@ -445,11 +481,11 @@
 
     // --- شاشة النجاح ---
     function showSuccessScreen(data) {
-      const score = data.score || 0;
-      const max = data.max || 100;
-      const percentage = Math.round((score / max) * 100);
+      // الوصول للبيانات داخل كائن results كما يرسلها الـ Workflow
+      const score = data.results?.totalScore || 0;
+      const max = data.results?.maxScore || 100;
+      const percentage = max > 0 ? Math.round((score / max) * 100) : 0;
       
-      // تشغيل التأثيرات
       if (percentage >= 50 && typeof confetti !== 'undefined') {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       }
@@ -457,8 +493,8 @@
       document.getElementById("surveyContainer").innerHTML = `
         <div class="success-card fade-in">
           <div class="checkmark-icon"><i class="fas fa-check"></i></div>
-          <h2 style="color: var(--primary-color); font-size: 1.8rem; margin-bottom: 10px;">تم إرسال الاختبار بنجاح!</h2>
-          <p style="color: var(--text-muted); margin-bottom: 30px;">شكراً لك، تم حفظ إجاباتك.</p>
+          <h2 style="color: var(--primary-color); font-size: 1.8rem; margin-bottom: 10px;">تم تسليم الاختبار!</h2>
+          <p style="color: var(--text-muted); margin-bottom: 30px;">تم حفظ إجاباتك بنجاح، فيما يلي نتيجتك:</p>
           
           <div class="score-circle">
             <svg viewBox="0 0 140 140">
@@ -484,7 +520,6 @@
         </div>
       `;
 
-      // تحريك الدائرة
       setTimeout(() => {
         const circle = document.getElementById('scoreCircle');
         if (circle) {
