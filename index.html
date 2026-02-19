@@ -7,7 +7,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- SurveyJS -->
+  <!-- SurveyJS - استخدام النسخة الكلاسيكية -->
   <link href="https://unpkg.com/survey-core@1.9.120/defaultV2.min.css" rel="stylesheet" />
   <script src="https://unpkg.com/survey-core@1.9.120/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-core@1.9.120/survey.i18n.min.js"></script>
@@ -21,14 +21,11 @@
     input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 500px; }
+    #surveyContainer { margin-top: 30px; min-height: 500px; border: 2px dashed #ccc; padding: 20px; }
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
     .debug-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; direction: ltr; text-align: left; display: none; }
-    /* تنسيق إضافي لضمان ظهور SurveyJS */
-    .sd-root-modern { direction: rtl !important; }
-    .sd-body { direction: rtl !important; }
   </style>
 </head>
 <body>
@@ -96,14 +93,12 @@
         
         showDebug('استلام البيانات: نجاح');
         
-        // إصلاحات مهمة للبيانات
+        // تنظيف البيانات
         if (surveyJson.pages) {
           surveyJson.pages.forEach(page => {
             if (page.elements) {
               page.elements.forEach(q => {
-                // إزالة correctAnswer
                 if (q.correctAnswer) delete q.correctAnswer;
-                // إصلاح choices
                 if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
                   q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
                 }
@@ -112,56 +107,57 @@
           });
         }
 
-        // إذا كان firstPageIsStarted مفعل، نحتاج لإضافة صفحة بداية
-        if (surveyJson.firstPageIsStarted) {
-          showDebug('firstPageIsStarted: true - إضافة صفحة بداية');
-          // نلغي firstPageIsStarted ونضيف صفحة ترحيب يدوياً إذا لزم
-          surveyJson.firstPageIsStarted = false;
-        }
-
+        // إلغاء firstPageIsStarted
+        surveyJson.firstPageIsStarted = false;
+        
         showDebug('الصفحات: ' + surveyJson.pages.length);
         showDebug('الأسئلة: ' + surveyJson.pages[0].elements.length);
         
         document.getElementById('loading').style.display = 'none';
 
-        // إنشاء النموذج
-        const survey = new Survey.Model(surveyJson);
-        
-        // إعدادات إضافية
-        survey.locale = "ar";
-        survey.showNavigationButtons = true;
-        survey.showProgressBar = "top";
-        
-        showDebug('إنشاء النموذج: نجاح');
-        
-        // عرض الاختبار مباشرة
+        // طريقة 1: استخدام render مع HTMLElement مباشرة
         const container = document.getElementById('surveyContainer');
-        container.innerHTML = ''; // تنظيف
+        container.innerHTML = '';
         
-        // استخدام render مع معالجة الأخطاء
+        showDebug('جاري إنشاء النموذج...');
+        const survey = new Survey.Model(surveyJson);
+        survey.locale = "ar";
+        
+        // التحقق من أن النموذج تم إنشاؤه
+        if (!survey) {
+          throw new Error("فشل إنشاء نموذج SurveyJS");
+        }
+        
+        showDebug('النموذج تم إنشاؤه، جاري العرض...');
+        
+        // محاولة العرض بطريقة مختلفة
         try {
+          // الطريقة الأولى: render مباشر
           survey.render(container);
-          showDebug('render(): تم الاستدعاء');
           
-          // فحص بعد لحظة
           setTimeout(() => {
-            const html = container.innerHTML;
-            showDebug('طول HTML: ' + html.length);
-            
-            if (html.length < 100) {
-              showDebug('تحذير: HTML قصير جداً!');
-              showDebug('المحتوى: ' + html);
+            if (container.innerHTML.length < 50) {
+              showDebug('الطريقة 1 فشلت، جاري المحاولة 2...');
               
-              // محاولة إعادة العرض
-              container.innerHTML = '<div id="surveyRoot" style="min-height:400px;"></div>';
-              survey.render(document.getElementById('surveyRoot'));
+              // الطريقة الثانية: استخدام innerHTML يدوياً
+              container.innerHTML = '<div class="sd-root-modern" style="direction:rtl;"><div class="sd-container-modern">';
+              
+              // إعادة إنشاء وعرض
+              const survey2 = new Survey.Model(surveyJson);
+              survey2.locale = "ar";
+              survey2.render(container.querySelector('.sd-container-modern'));
+              
+              setTimeout(() => {
+                showDebug('طول HTML بعد الطريقة 2: ' + container.innerHTML.length);
+              }, 500);
             } else {
-              showDebug('الاختبار يظهر بنجاح!');
+              showDebug('الطريقة 1 نجحت! طول HTML: ' + container.innerHTML.length);
             }
           }, 500);
           
-        } catch (renderError) {
-          showDebug('خطأ في render: ' + renderError.message);
+        } catch (renderErr) {
+          showDebug('خطأ في render: ' + renderErr.message);
+          console.error(renderErr);
         }
 
         // عند الإكمال
