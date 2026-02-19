@@ -25,6 +25,7 @@
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
+    #debugInfo { background: #f5f5f5; padding: 15px; margin-top: 20px; border-radius: 8px; font-family: monospace; font-size: 12px; text-align: left; direction: ltr; display: none; }
   </style>
 </head>
 <body>
@@ -46,6 +47,7 @@
     <div id="loading">جاري جلب الأسئلة من السيرفر...</div>
     <div id="error"></div>
     <div id="surveyContainer"></div>
+    <div id="debugInfo"></div>
   </div>
 
   <script>
@@ -61,6 +63,13 @@
     // تحديث العنوان بناءً على معرف الاختبار
     if (examId) {
       document.getElementById('mainTitle').textContent = `اختبار: ${examId}`;
+    }
+
+    // دالة لعرض معلومات التصحيح
+    function showDebug(info) {
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.style.display = 'block';
+      debugDiv.innerHTML = '<strong>Debug Info:</strong><br>' + JSON.stringify(info, null, 2);
     }
 
     // 3. الدالة الأساسية لبدء الاختبار
@@ -93,11 +102,37 @@
           throw new Error("فشل في جلب البيانات من السيرفر. تأكد من صحة التوكن.");
         }
 
-        // ← الحل: استخراج أول عنصر إذا كانت البيانات مصفوفة
+        // استخراج أول عنصر إذا كانت البيانات مصفوفة
         const responseData = await response.json();
         const surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
         
         console.log("البيانات المستلمة:", surveyData);
+        showDebug({ receivedData: surveyData });
+
+        // فحص هيكل البيانات
+        if (!surveyData || typeof surveyData !== 'object') {
+          throw new Error("البيانات المستلمة غير صالحة");
+        }
+
+        if (!surveyData.pages || !Array.isArray(surveyData.pages)) {
+          throw new Error("هيكل البيانات غير صحيح: pages مفقودة أو ليست مصفوفة");
+        }
+
+        if (surveyData.pages.length === 0) {
+          throw new Error("لا توجد صفحات في هذا الاختبار");
+        }
+
+        // فحص كل صفحة
+        surveyData.pages.forEach((page, index) => {
+          console.log(`الصفحة ${index}:`, page);
+          if (!page.elements || !Array.isArray(page.elements)) {
+            console.warn(`الصفحة ${index} لا تحتوي على elements`);
+            page.elements = []; // إنشاء مصفوفة فارغة إذا لم تكن موجودة
+          }
+        });
+
+        console.log("عدد الصفحات:", surveyData.pages.length);
+        console.log("إجمالي الأسئلة:", surveyData.pages.reduce((sum, p) => sum + (p.elements?.length || 0), 0));
 
         // إخفاء التحميل
         document.getElementById('loading').style.display = 'none';
@@ -136,9 +171,10 @@
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').textContent = err.message;
+        document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
         console.error("Error Details:", err);
+        showDebug({ error: err.message, stack: err.stack });
       }
     }
   </script>
