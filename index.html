@@ -7,8 +7,10 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   
+  <!-- SurveyJS CSS -->
   <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
   
+  <!-- SurveyJS Scripts -->
   <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-core/survey.i18n.min.js"></script>
 
@@ -21,10 +23,11 @@
     input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 500px; }
+    #surveyContainer { margin-top: 30px; min-height: 500px; border: 2px dashed #ccc; padding: 20px; }
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
+    .success-msg { background: #4caf50; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -49,42 +52,32 @@
   </div>
 
   <script>
-    // 1. روابط الـ Webhook الخاصة بك في n8n
+    // روابط Webhook
     const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
     const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
 
-    // 2. استخراج المعطيات من الرابط (URL Parameters)
+    // استخراج المعطيات من الرابط
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam');
     const token = urlParams.get('token');
 
-    // تحديث العنوان بناءً على معرف الاختبار
     if (examId) {
       document.getElementById('mainTitle').textContent = `اختبار: ${examId}`;
     }
 
-    // دالة لتنظيف وإصلاح هيكل البيانات
+    // دالة لتنظيف البيانات
     function fixSurveyData(data) {
-      // إزالة correctAnswer لأنه غير مدعوم في النسخة المجانية
-      // أو تحويله إلى خاصية مخصصة إذا أردت الاحتفاظ به
-      
       if (data.pages && Array.isArray(data.pages)) {
         data.pages.forEach(page => {
           if (page.elements && Array.isArray(page.elements)) {
             page.elements.forEach(element => {
-              // إزالة correctAnswer إذا موجود (غير مدعوم في النسخة المجانية)
               if (element.correctAnswer) {
-                // يمكننا حفظه في خاصية مخصصة إذا أردت
                 element.correctAnswerValue = element.correctAnswer;
                 delete element.correctAnswer;
               }
-              
-              // التأكد من أن choices هي مصفوفة
               if (element.choices && !Array.isArray(element.choices)) {
                 element.choices = [];
               }
-              
-              // إصلاح السؤال 3: إذا كان choices تحتوي على 'Error' فقط
               if (element.choices && element.choices.length === 1 && element.choices[0] === 'Error') {
                 element.choices = ['خيار 1', 'خيار 2', 'خيار 3', 'خيار 4'];
               }
@@ -92,16 +85,13 @@
           }
         });
       }
-      
       return data;
     }
 
-    // 3. الدالة الأساسية لبدء الاختبار
     async function startExam() {
       const name = document.getElementById('studentName').value.trim();
       const email = document.getElementById('studentEmail').value.trim();
 
-      // التحقق من المدخلات
       if (!name || !email.includes('@')) {
         alert('يرجى إدخال اسمك وبريدك الإلكتروني بشكل صحيح');
         return;
@@ -112,12 +102,10 @@
         return;
       }
 
-      // إخفاء النموذج وإظهار رسالة التحميل
       document.getElementById('studentForm').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
 
       try {
-        // بناء الرابط لجلب الأسئلة
         const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
         
         const response = await fetch(fetchUrl);
@@ -126,43 +114,31 @@
           throw new Error("فشل في جلب البيانات من السيرفر. تأكد من صحة التوكن.");
         }
 
-        // استخراج أول عنصر إذا كانت البيانات مصفوفة
         const responseData = await response.json();
         let surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
         
         console.log("البيانات قبل التصليح:", surveyData);
-
-        // تنظيف وإصلاح البيانات
         surveyData = fixSurveyData(surveyData);
-        
         console.log("البيانات بعد التصليح:", surveyData);
 
-        // فحص هيكل البيانات
         if (!surveyData || typeof surveyData !== 'object') {
           throw new Error("البيانات المستلمة غير صالحة");
         }
 
         if (!surveyData.pages || !Array.isArray(surveyData.pages)) {
-          throw new Error("هيكل البيانات غير صحيح: pages مفقودة أو ليست مصفوفة");
+          throw new Error("هيكل البيانات غير صحيح: pages مفقودة");
         }
 
-        if (surveyData.pages.length === 0) {
-          throw new Error("لا توجد صفحات في هذا الاختبار");
-        }
-
-        // إخفاء التحميل
         document.getElementById('loading').style.display = 'none';
 
-        // تهيئة واجهة الاختبار SurveyJS
+        // إنشاء نموذج SurveyJS
         const survey = new Survey.Model(surveyData);
-        
-        // ضبط اللغة للعربية لضمان اتجاه النص الصحيح
         survey.locale = "ar";
 
-        // رسم الاختبار داخل الحاوية
-        survey.render("surveyContainer");
+        // استخدام الطريقة الجديدة للعرض
+        survey.render(document.getElementById("surveyContainer"));
 
-        // إرسال النتائج عند الضغط على زر "إرسال" (Complete)
+        // معالجة إكمال الاختبار
         survey.onComplete.add(async (sender) => {
           const results = {
             exam: examId,
@@ -179,9 +155,14 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(results)
             });
-            console.log("تم إرسال النتائج بنجاح");
+            
+            // إظهار رسالة نجاح
+            document.getElementById('surveyContainer').innerHTML = 
+              '<div class="success-msg">تم إرسال إجاباتك بنجاح! شكراً لك.</div>';
+              
           } catch (postErr) {
             console.error("خطأ في إرسال النتائج:", postErr);
+            alert("تم إكمال الاختبار لكن حدث خطأ في إرسال النتائج");
           }
         });
 
