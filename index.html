@@ -1,413 +1,829 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>نظام الاختبارات المتقدم</title>
-
-  <!-- الخطوط -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  
-  <!-- أيقونات (للوضع الليلي والشعار) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- SurveyJS Libraries -->
-  <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
-  <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet" />
-  <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
-  <script src="https://unpkg.com/survey-knockout@1.9.120/survey.locales.min.js"></script>
-
-  <style>
-    :root {
-      /* متغيرات الألوان - أزرق ملكي */
-      --primary-color: #1e3a8a; /* Royal Blue */
-      --primary-light: #3b82f6;
-      --primary-dark: #1e40af;
-      --accent-color: #f59e0b; /* ذهبي للأكسنت */
-      
-      /* خلفيات الوضع الفاتح */
-      --bg-main: #f3f4f6;
-      --bg-card: #ffffff;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
-      --border-color: #e5e7eb;
-      
-      /* ألوان SurveyJS */
-      --sjs-primary: var(--primary-color);
-      --sjs-primary-fore: #ffffff;
-    }
-
-    [data-theme="dark"] {
-      /* متغيرات الوضع الليلي */
-      --bg-main: #111827;
-      --bg-card: #1f2937;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --border-color: #374151;
-      
-      --primary-color: #3b82f6;
-      --primary-dark: #2563eb;
-    }
-
-    * { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="نظام اختبارات بايثون الاحترافي">
+    <title>نظام اختبارات بايثون</title>
     
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: var(--bg-main);
-      margin: 0;
-      padding: 0;
-      color: var(--text-main);
-      min-height: 100vh;
-    }
-
-    /* --- الهيدر والشعار --- */
-    header {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: white;
-      padding: 15px 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 45px;
-      height: 45px;
-      background: white;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-color);
-      font-size: 22px;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .site-title {
-      font-size: 1.4rem;
-      font-weight: 900;
-      margin: 0;
-      letter-spacing: -0.5px;
-    }
-
-    /* زر الوضع الليلي */
-    .theme-toggle {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
-
-    /* --- الحاوية الرئيسية --- */
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      background: var(--bg-card);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      border: 1px solid var(--border-color);
-    }
-
-    h1 { color: var(--primary-color); text-align: center; margin-bottom: 30px; font-weight: 900; font-size: 2rem; }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/survey-core@1.9.110/survey.core.min.js"></script>
+    <script src="https://unpkg.com/survey-core@1.9.110/survey.i18n.min.js"></script>
+    <link href="https://unpkg.com/survey-core@1.9.110/defaultV2.min.css" rel="stylesheet"/>
     
-    .form-group { margin-bottom: 25px; }
-    label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
-    input {
-      width: 100%; padding: 15px;
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      font-size: 16px;
-      font-family: 'Cairo', sans-serif;
-      background: var(--bg-main);
-      color: var(--text-main);
-    }
-    input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
-
-    button.main-btn {
-      width: 100%;
-      background: linear-gradient(to left, var(--primary-color), var(--primary-light));
-      color: white;
-      padding: 16px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
-    }
-    button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4); }
-
-    /* --- تنسيق SurveyJS --- */
-    #surveyContainer { margin-top: 10px; }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    /* إجبار SurveyJS على استخدام خط Cairo وألوان Royal Blue */
-    .sd-root-modern {
-      font-family: 'Cairo', sans-serif !important;
-      color: var(--text-main) !important;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    /* خلفية بطاقة السؤال */
-    .sd-page {
-      background: var(--bg-main) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 12px !important;
-      padding: 30px !important;
-      margin-bottom: 20px;
-    }
-
-    /* نص السؤال */
-    .sd-title { font-weight: 800 !important; color: var(--text-main) !important; font-size: 1.1rem !important; }
-
-    /* الأزرار (التالي/السابق/إنهاء) */
-    .sd-btn {
-      background: var(--primary-color) !important;
-      color: white !important;
-      font-family: 'Cairo', sans-serif !important;
-      font-weight: 700 !important;
-      border-radius: 8px !important;
-      padding: 10px 30px !important;
-      border: none !important;
-      font-size: 16px !important;
-    }
-    .sd-btn:hover { background: var(--primary-dark) !important; }
-    
-    /* زر الإنهاء بلون مختلف */
-    .sd-navigation__complete-btn { background: #16a34a !important; }
-    
-    /* شريط التقدم */
-    .sd-progress { background: var(--border-color) !important; height: 8px !important; border-radius: 4px; }
-    .sd-progress__bar { background: var(--primary-color) !important; border-radius: 4px; }
-
-    /* حالة التحميل والخطأ */
-    .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 25px; border-radius: 12px; }
-    #loading { background: #eff6ff; color: #1e40af; }
-    #error { background: #fef2f2; color: #b91c1c; }
-    
-    /* تذييل الصفحة */
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- الهيدر -->
-  <header>
-    <div class="header-content">
-      <div class="logo-area">
-        <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
-        <h2 class="site-title">منصة الاختبارات</h2>
-      </div>
-      <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي">
-        <i class="fas fa-moon" id="themeIcon"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- المحتوى -->
-  <div class="container">
-    <h1 id="mainTitle">بدء الاختبار</h1>
-    
-    <div id="studentForm">
-      <div class="form-group">
-        <label>الاسم الكامل</label>
-        <input type="text" id="studentName" placeholder="يرجى كتابة اسمك الثلاثي" required />
-      </div>
-      <div class="form-group">
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="studentEmail" placeholder="example@domain.com" required />
-      </div>
-      <button class="main-btn" onclick="startExam()">
-        <i class="fas fa-play-circle" style="margin-left: 8px;"></i> ابدأ الاختبار الآن
-      </button>
-    </div>
-
-    <div id="loading" class="status-box" style="display:none;">
-      <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i><br>
-      جاري تحميل الأسئلة...
-    </div>
-    
-    <div id="error" class="status-box" style="display:none;"></div>
-    <div id="surveyContainer"></div>
-  </div>
-
-  <footer>
-    جميع الحقوق محفوظة &copy; 2024 - نظام إدارة الاختبارات
-  </footer>
-
-  <script>
-    // --- منطق الوضع الليلي ---
-    function toggleTheme() {
-      const body = document.body;
-      const icon = document.getElementById('themeIcon');
-      if (body.getAttribute('data-theme') === 'dark') {
-        body.removeAttribute('data-theme');
-        icon.className = 'fas fa-moon';
-        localStorage.setItem('theme', 'light');
-      } else {
-        body.setAttribute('data-theme', 'dark');
-        icon.className = 'fas fa-sun';
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-    // تحميل التفضيل المحفوظ
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.setAttribute('data-theme', 'dark');
-      document.getElementById('themeIcon').className = 'fas fa-sun';
-    }
-
-    // --- منطق الاختبار ---
-    const GET_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/get-survey";
-    const POST_URL = "https://n8n.srv1332143.hstgr.cloud/webhook/submit-exam";
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const examId = urlParams.get('exam');
-    const token = urlParams.get('token');
-
-    async function startExam() {
-      const name = document.getElementById('studentName').value.trim();
-      const email = document.getElementById('studentEmail').value.trim();
-
-      if (!name || !email.includes('@')) {
-        alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
-        return;
-      }
-
-      if (!examId || !token) {
-        alert('خطأ: الرابط غير مكتمل (توكن أو معرف الاختبار مفقود)');
-        return;
-      }
-
-      document.getElementById('studentForm').style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('mainTitle').textContent = "جاري التحميل...";
-
-      try {
-        const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-        
-        const response = await fetch(fetchUrl);
-        if (!response.ok) throw new Error("فشل الاتصال بالخادم");
-        
-        const responseData = await response.json();
-        let surveyJson = Array.isArray(responseData) ? responseData[0] : responseData;
-        
-        // 1. تنظيف البيانات (أمان وإصلاحات)
-        if (surveyJson.pages) {
-          surveyJson.pages.forEach(page => {
-            if (page.elements) {
-              page.elements.forEach(q => {
-                if (q.correctAnswer) delete q.correctAnswer;
-                if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
-                  q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
                 }
-              });
             }
-          });
         }
-
-        // 2. حل مشكلة "ظهور الأسئلة تحت بعضها": نقسم الأسئلة إلى صفحات
-        // إذا كان هناك صفحة واحدة تحوي عدة أسئلة، سنحولها إلى صفحات منفصلة
-        if (surveyJson.pages && surveyJson.pages.length === 1 && surveyJson.pages[0].elements && surveyJson.pages[0].elements.length > 1) {
-           const questions = surveyJson.pages[0].elements;
-           const newPages = questions.map((q, index) => ({
-             name: "page" + index,
-             elements: [q]
-           }));
-           surveyJson.pages = newPages;
+    </script>
+    
+    <style>
+        /* Light Mode */
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8ecf1;
+            --text-primary: #1a2332;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-light: rgba(37, 99, 235, 0.08);
+            --border: #d1d9e6;
+            --shadow: rgba(26, 35, 50, 0.08);
+            --success: #059669;
+            --danger: #dc2626;
         }
         
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('mainTitle').textContent = "الاختبار";
-
-        // 3. إعداد النموذج
-        const survey = new Survey.Model(surveyJson);
-        survey.locale = "ar";
+        /* Dark Mode */
+        .dark {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #3b82f6;
+            --accent-hover: #58a6ff;
+            --accent-light: rgba(59, 130, 246, 0.12);
+            --border: #30363d;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --success: #3fb950;
+            --danger: #f85149;
+        }
         
-        // إجبار إظهار أزرار التنقل
-        survey.showNavigationButtons = true; 
-        survey.showProgressBar = "top";
-        survey.showTitle = false; // نستخدم العنوان الخاص بنا
+        * {
+            font-family: 'Cairo', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Subtle Grid Pattern */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+        
+        .dark .bg-pattern {
+            opacity: 0.1;
+        }
+        
+        /* Card */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Timer Ring */
+        .timer-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .timer-ring-bg {
+            stroke: var(--border);
+        }
+        
+        .timer-ring-progress {
+            stroke: var(--accent);
+            transition: stroke-dashoffset 1s linear;
+        }
+        
+        .timer-warning .timer-ring-progress {
+            stroke: var(--danger);
+        }
+        
+        /* Fade In */
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Pulse */
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        
+        /* Score Circle */
+        .score-circle {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+        
+        .score-circle-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 10;
+        }
+        
+        .score-circle-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 1.2s ease;
+        }
+        
+        .score-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+        
+        .theme-toggle i {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* SurveyJS Custom Styles */
+        .sd-root-modern {
+            --primary: var(--accent) !important;
+            --primary-light: var(--accent-light) !important;
+            --background: var(--bg-secondary) !important;
+            --background-dim: var(--bg-tertiary) !important;
+            --foreground: var(--text-primary) !important;
+            --foreground-light: var(--text-secondary) !important;
+            --border: var(--border) !important;
+            --corner-radius: 10px !important;
+        }
+        
+        .sd-root-modern .sd-title {
+            font-family: 'Cairo', sans-serif !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .sd-root-modern .sd-description {
+            color: var(--text-secondary) !important;
+        }
+        
+        .sd-root-modern .sd-question__title {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .sd-root-modern .sd-item {
+            background: var(--bg-tertiary) !important;
+            border: 2px solid var(--border) !important;
+            border-radius: 10px !important;
+            padding: 12px 16px !important;
+            margin-bottom: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .sd-root-modern .sd-item:hover {
+            border-color: var(--accent) !important;
+        }
+        
+        .sd-root-modern .sd-item--checked {
+            border-color: var(--accent) !important;
+            background: var(--accent-light) !important;
+        }
+        
+        .sd-root-modern .sd-item__control-label {
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .sd-root-modern .sd-btn {
+            background: var(--accent) !important;
+            color: white !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .sd-root-modern .sd-btn:hover {
+            background: var(--accent-hover) !important;
+            transform: translateY(-1px);
+        }
+        
+        .sd-root-modern .sd-navigation__complete-btn {
+            background: var(--success) !important;
+        }
+        
+        .sd-root-modern .sd-body,
+        .sd-root-modern .sd-page,
+        .sd-root-modern .sd-panel {
+            background: transparent !important;
+        }
+        
+        .sd-root-modern .sd-question {
+            padding: 0 !important;
+        }
+        
+        .sd-root-modern .sd-selectbase {
+            padding: 0 !important;
+            border: none !important;
+        }
+        
+        .sd-root-modern .sd-progress-buttons {
+            background: var(--bg-tertiary) !important;
+            border-radius: 10px !important;
+            padding: 8px !important;
+        }
+        
+        .sd-root-modern pre {
+            background: var(--bg-primary) !important;
+            border-radius: 8px !important;
+            padding: 14px !important;
+            direction: ltr !important;
+            text-align: left !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+        
+        /* Stat Card */
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
 
-        // تطبيق خصائص RTL
-        survey.onAfterRenderPage.add(() => {
-           // يمكن إضافة تعديلات إضافية هنا إذا لزم الأمر
+    <!-- Header -->
+    <header class="card fixed top-0 left-0 right-0 z-50 rounded-none border-t-0 border-l-0 border-r-0">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--accent);">
+                    <i class="fab fa-python text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold" style="color: var(--text-primary);">Python Quiz</h1>
+                    <p id="header-subtitle" class="text-xs" style="color: var(--text-muted);">نظام الاختبارات</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Timer -->
+                <div id="timer-wrapper" class="hidden">
+                    <div id="timer-container" class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: var(--bg-tertiary); border: 1px solid var(--border);">
+                        <svg class="timer-ring" width="32" height="32">
+                            <circle class="timer-ring-bg" stroke-width="3" fill="transparent" r="13" cx="16" cy="16"/>
+                            <circle id="timer-progress" class="timer-ring-progress" stroke-width="3" fill="transparent" r="13" cx="16" cy="16" stroke-dasharray="81.7" stroke-dashoffset="0" stroke-linecap="round"/>
+                        </svg>
+                        <div class="text-right">
+                            <div id="timer-display" class="text-base font-bold font-mono" style="color: var(--text-primary);">00:00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="theme-toggle" aria-label="تبديل السمة">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 container mx-auto px-4 pt-24 pb-8 min-h-screen">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="flex flex-col items-center justify-center min-h-[70vh]">
+            <div class="card p-8 text-center fade-in max-w-md w-full">
+                <div class="spinner mx-auto mb-4"></div>
+                <h2 class="text-lg font-bold mb-1" style="color: var(--text-primary);">جاري تحميل الاختبار</h2>
+                <p id="loading-message" style="color: var(--text-secondary);">يرجى الانتظار...</p>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden">
+            <div class="max-w-lg mx-auto card p-8 text-center fade-in">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(220, 38, 38, 0.1);">
+                    <i class="fas fa-exclamation-triangle text-3xl" style="color: var(--danger);"></i>
+                </div>
+                <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">حدث خطأ</h2>
+                <p id="error-message" class="mb-5" style="color: var(--text-secondary);"></p>
+                <button onclick="location.reload()" class="px-6 py-2 rounded-lg font-semibold text-white" style="background: var(--accent);">
+                    <i class="fas fa-redo ml-2"></i>
+                    إعادة المحاولة
+                </button>
+            </div>
+        </div>
+
+        <!-- Survey Container -->
+        <div id="survey-wrapper" class="hidden">
+            <!-- Exam Info -->
+            <div id="exam-info" class="card p-4 mb-4 fade-in">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 id="exam-title" class="text-lg font-bold" style="color: var(--text-primary);"></h2>
+                        <p id="exam-description" class="text-sm" style="color: var(--text-secondary);"></p>
+                    </div>
+                    <div class="flex items-center gap-5">
+                        <div class="text-center">
+                            <div id="questions-count" class="text-xl font-bold" style="color: var(--accent);">0</div>
+                            <div class="text-xs" style="color: var(--text-muted);">سؤال</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="duration-display" class="text-xl font-bold" style="color: var(--accent);">0</div>
+                            <div class="text-xs" style="color: var(--text-muted);">دقيقة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SurveyJS -->
+            <div class="card p-5 fade-in">
+                <div id="surveyContainer"></div>
+            </div>
+        </div>
+
+        <!-- Submitting State -->
+        <div id="submitting-state" class="hidden">
+            <div class="flex flex-col items-center justify-center min-h-[70vh]">
+                <div class="card p-8 text-center fade-in max-w-md w-full">
+                    <div class="spinner mx-auto mb-4"></div>
+                    <h2 class="text-lg font-bold mb-1" style="color: var(--text-primary);">جاري تصحيح الإجابات</h2>
+                    <p style="color: var(--text-secondary);">يرجى الانتظار...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success State -->
+        <div id="success-state" class="hidden">
+            <div class="max-w-xl mx-auto">
+                <div class="card p-6 text-center fade-in">
+                    <!-- Result Icon -->
+                    <div id="result-icon" class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"></div>
+                    
+                    <h2 id="result-title" class="text-2xl font-bold mb-1" style="color: var(--text-primary);"></h2>
+                    <p id="result-message" class="mb-6" style="color: var(--text-secondary);"></p>
+
+                    <!-- Score Circle -->
+                    <div class="flex justify-center mb-6">
+                        <div class="score-circle">
+                            <svg width="140" height="140" viewBox="0 0 140 140">
+                                <circle class="score-circle-bg" cx="70" cy="70" r="60"/>
+                                <circle id="score-progress" class="score-circle-progress" cx="70" cy="70" r="60"/>
+                            </svg>
+                            <div class="score-value">
+                                <span id="score-percentage" class="text-3xl font-black" style="color: var(--text-primary);">0%</span>
+                                <span class="text-xs" style="color: var(--text-muted);">النتيجة</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="stat-card">
+                            <div id="score-value" class="text-2xl font-bold" style="color: var(--accent);">0</div>
+                            <div class="text-xs" style="color: var(--text-muted);">درجتك</div>
+                        </div>
+                        <div class="stat-card">
+                            <div id="max-value" class="text-2xl font-bold" style="color: var(--success);">0</div>
+                            <div class="text-xs" style="color: var(--text-muted);">الكاملة</div>
+                        </div>
+                        <div class="stat-card">
+                            <div id="time-spent" class="text-2xl font-bold" style="color: var(--text-secondary);">0</div>
+                            <div class="text-xs" style="color: var(--text-muted);">دقيقة</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-center">
+                        <button onclick="window.print()" class="px-6 py-2 rounded-lg font-semibold" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border);">
+                            <i class="fas fa-print ml-2"></i>
+                            طباعة النتيجة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 card mt-8 rounded-none border-b-0 border-l-0 border-r-0 py-3">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-xs" style="color: var(--text-muted);">Python Quiz System - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Configuration =====
+        const CONFIG = {
+            BASE_URL: 'https://n8n.srv1332143.hstgr.cloud/webhook',
+            ENDPOINTS: {
+                GET_SURVEY: '/get-survey',
+                SUBMIT_EXAM: '/submit-exam'
+            }
+        };
+
+        // ===== State =====
+        const state = {
+            examId: '',
+            examToken: '',
+            timeLimit: 0,
+            startTime: null,
+            timerInterval: null,
+            survey: null,
+            examData: null,
+            isDark: false
+        };
+
+        // ===== DOM Elements =====
+        const DOM = {
+            loadingState: document.getElementById('loading-state'),
+            loadingMessage: document.getElementById('loading-message'),
+            errorState: document.getElementById('error-state'),
+            errorMessage: document.getElementById('error-message'),
+            surveyWrapper: document.getElementById('survey-wrapper'),
+            surveyContainer: document.getElementById('surveyContainer'),
+            submittingState: document.getElementById('submitting-state'),
+            successState: document.getElementById('success-state'),
+            timerWrapper: document.getElementById('timer-wrapper'),
+            timerContainer: document.getElementById('timer-container'),
+            timerDisplay: document.getElementById('timer-display'),
+            timerProgress: document.getElementById('timer-progress'),
+            examTitle: document.getElementById('exam-title'),
+            examDescription: document.getElementById('exam-description'),
+            questionsCount: document.getElementById('questions-count'),
+            durationDisplay: document.getElementById('duration-display'),
+            headerSubtitle: document.getElementById('header-subtitle'),
+            themeToggle: document.getElementById('theme-toggle'),
+            themeIcon: document.getElementById('theme-icon')
+        };
+
+        // ===== Initialize =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            initExam();
         });
 
-        survey.render("surveyContainer");
+        // ===== Theme =====
+        function initTheme() {
+            const savedTheme = localStorage.getItem('quiz-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            state.isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+            applyTheme();
+            
+            DOM.themeToggle.addEventListener('click', toggleTheme);
+        }
 
-        // 4. عند الإرسال
-        survey.onComplete.add(async (sender) => {
-          document.getElementById("surveyContainer").innerHTML = `
-            <div class="status-box" style="background:#ecfdf5; color:#065f46;">
-              <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:10px;"></i><br>
-              جاري إرسال إجاباتك...
-            </div>`;
+        function toggleTheme() {
+            state.isDark = !state.isDark;
+            localStorage.setItem('quiz-theme', state.isDark ? 'dark' : 'light');
+            applyTheme();
+        }
 
-          const results = {
-            exam: examId,
-            token: token,
-            studentName: name,
-            studentEmail: email,
-            answers: sender.data,
-            finishedAt: new Date().toISOString()
-          };
+        function applyTheme() {
+            if (state.isDark) {
+                document.documentElement.classList.add('dark');
+                DOM.themeIcon.className = 'fas fa-sun';
+            } else {
+                document.documentElement.classList.remove('dark');
+                DOM.themeIcon.className = 'fas fa-moon';
+            }
+        }
 
-          try {
-            await fetch(POST_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(results)
+        // ===== Exam =====
+        async function initExam() {
+            const params = getUrlParams();
+            
+            if (!params.examId || !params.examToken) {
+                showError('معرف الاختبار أو الرمز مفقود', 'تأكد من أن الرابط صحيح');
+                return;
+            }
+
+            state.examId = params.examId;
+            state.examToken = params.examToken;
+
+            await loadSurveyData();
+        }
+
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                examId: urlParams.get('exam') || urlParams.get('exam_id'),
+                examToken: urlParams.get('token')
+            };
+        }
+
+        async function loadSurveyData() {
+            try {
+                DOM.loadingMessage.textContent = 'جاري الاتصال بالخادم...';
+                
+                const response = await fetch(
+                    `${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.GET_SURVEY}?exam=${state.examId}&token=${state.examToken}`,
+                    {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطأ في الاتصال (' + response.status + ')');
+                }
+
+                const data = await response.json();
+
+                if (data.error || data.success === false) {
+                    throw new Error(data.message || data.error || 'فشل في تحميل الاختبار');
+                }
+
+                state.examData = data;
+                initializeExam(data);
+
+            } catch (error) {
+                console.error('Load Error:', error);
+                showError('فشل الاتصال بالخادم', error.message);
+            }
+        }
+
+        function initializeExam(data) {
+            DOM.examTitle.textContent = data.title || 'اختبار';
+            DOM.headerSubtitle.textContent = data.title || 'نظام الاختبارات';
+            DOM.examDescription.textContent = data.description || '';
+            
+            const questionsLength = data.pages?.[0]?.elements?.length || 0;
+            DOM.questionsCount.textContent = questionsLength;
+            
+            const durationMin = parseInt(data.durationMin || data.duration_min || 15);
+            DOM.durationDisplay.textContent = durationMin;
+            
+            state.timeLimit = durationMin * 60;
+            state.startTime = Date.now();
+
+            initializeSurvey(data);
+            startTimer();
+
+            DOM.loadingState.classList.add('hidden');
+            DOM.surveyWrapper.classList.remove('hidden');
+            DOM.timerWrapper.classList.remove('hidden');
+        }
+
+        function initializeSurvey(surveyJSON) {
+            Survey.surveyLocalization.currentLocale = 'ar';
+            state.survey = new Survey.Model(surveyJSON);
+
+            state.survey.onComplete.add(function(sender) {
+                submitExam(sender.data);
             });
-            document.getElementById("surveyContainer").innerHTML = `
-              <div class="status-box" style="background:#ecfdf5; color:#065f46;">
-                <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:10px;"></i><br>
-                <h2>تم بنجاح!</h2>
-                <p>شكراً لك، تم إرسال إجاباتك بنجاح.</p>
-              </div>`;
-          } catch (e) {
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error').textContent = "حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً.";
-            console.error(e);
-          }
-        });
 
-      } catch (err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('error').innerHTML = `<i class="fas fa-exclamation-triangle"></i> خطأ: ${err.message}`;
-        console.error(err);
-      }
-    }
-  </script>
+            DOM.surveyContainer.appendChild(state.survey.render());
+        }
+
+        // ===== Timer =====
+        function startTimer() {
+            updateTimerDisplay();
+            
+            state.timerInterval = setInterval(function() {
+                const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+                const remaining = Math.max(0, state.timeLimit - elapsed);
+
+                updateTimerDisplay(remaining);
+                updateTimerProgress(remaining);
+
+                if (remaining <= 60) {
+                    DOM.timerContainer.classList.add('timer-warning');
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(state.timerInterval);
+                    state.timerInterval = null;
+                    if (state.survey) {
+                        state.survey.completeLastPage();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(remaining) {
+            if (typeof remaining === 'undefined') {
+                remaining = state.timeLimit;
+            }
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            DOM.timerDisplay.textContent = mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+        }
+
+        function updateTimerProgress(remaining) {
+            const progress = remaining / state.timeLimit;
+            const circumference = 2 * Math.PI * 13;
+            const offset = circumference * (1 - progress);
+            DOM.timerProgress.style.strokeDashoffset = offset;
+        }
+
+        // ===== Submit =====
+        async function submitExam(answers) {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+
+            DOM.surveyWrapper.classList.add('hidden');
+            DOM.timerWrapper.classList.add('hidden');
+            DOM.submittingState.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SUBMIT_EXAM}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        exam: state.examId,
+                        token: state.examToken,
+                        answers: answers,
+                        finishedAt: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('خطأ في إرسال الإجابات');
+                }
+
+                const result = await response.json();
+                showSuccess(result);
+
+            } catch (error) {
+                console.error('Submit Error:', error);
+                showSuccess({ score: 0, max: 0 });
+            }
+        }
+
+        // ===== UI States =====
+        function showError(title, message) {
+            DOM.loadingState.classList.add('hidden');
+            DOM.errorState.classList.remove('hidden');
+            document.querySelector('#error-state h2').textContent = title;
+            DOM.errorMessage.textContent = message;
+        }
+
+        function showSuccess(result) {
+            DOM.submittingState.classList.add('hidden');
+            DOM.successState.classList.remove('hidden');
+
+            const score = result.score || 0;
+            const max = result.max || 100;
+            const percentage = max > 0 ? Math.round((score / max) * 100) : 0;
+            const timeSpent = state.startTime ? Math.round((Date.now() - state.startTime) / 60000) : 0;
+
+            const resultIcon = document.getElementById('result-icon');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+
+            if (percentage >= 80) {
+                resultIcon.innerHTML = '<i class="fas fa-trophy text-4xl" style="color: #f59e0b;"></i>';
+                resultIcon.style.background = 'rgba(245, 158, 11, 0.15)';
+                resultTitle.textContent = 'ممتاز!';
+                resultMessage.textContent = 'أداء رائع! أنت متقدم في بايثون';
+                celebrateSuccess();
+            } else if (percentage >= 60) {
+                resultIcon.innerHTML = '<i class="fas fa-thumbs-up text-4xl" style="color: var(--success);"></i>';
+                resultIcon.style.background = 'rgba(5, 150, 105, 0.15)';
+                resultTitle.textContent = 'جيد!';
+                resultMessage.textContent = 'أداء جيد! استمر في التعلم';
+            } else {
+                resultIcon.innerHTML = '<i class="fas fa-book text-4xl" style="color: var(--text-secondary);"></i>';
+                resultIcon.style.background = 'var(--bg-tertiary)';
+                resultTitle.textContent = 'حاول مرة أخرى';
+                resultMessage.textContent = 'تحتاج لمزيد من المراجعة';
+            }
+
+            document.getElementById('score-value').textContent = score;
+            document.getElementById('max-value').textContent = max;
+            document.getElementById('time-spent').textContent = timeSpent;
+            document.getElementById('score-percentage').textContent = percentage + '%';
+
+            setTimeout(function() {
+                const circleProgress = document.getElementById('score-progress');
+                if (circleProgress) {
+                    const circumference = 2 * Math.PI * 60;
+                    const offset = circumference - (percentage / 100) * circumference;
+                    circleProgress.style.strokeDashoffset = offset;
+                }
+            }, 100);
+        }
+
+        function celebrateSuccess() {
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 },
+                    colors: ['#2563eb', '#059669', '#f59e0b']
+                });
+            }
+        }
+    </script>
 </body>
 </html>
