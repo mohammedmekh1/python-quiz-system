@@ -7,12 +7,12 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- SurveyJS CSS -->
-  <link href="https://unpkg.com/survey-core/defaultV2.min.css" rel="stylesheet" />
+  <!-- SurveyJS CSS - نسخة محددة -->
+  <link href="https://unpkg.com/survey-core@1.9.120/defaultV2.min.css" rel="stylesheet" />
   
-  <!-- SurveyJS Scripts -->
-  <script src="https://unpkg.com/survey-core/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-core/survey.i18n.min.js"></script>
+  <!-- SurveyJS Scripts - نسخة محددة -->
+  <script src="https://unpkg.com/survey-core@1.9.120/survey.core.min.js"></script>
+  <script src="https://unpkg.com/survey-core@1.9.120/survey.i18n.min.js"></script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; direction: rtl; }
@@ -23,11 +23,12 @@
     input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; min-height: 500px; border: 2px dashed #ccc; padding: 20px; }
+    #surveyContainer { margin-top: 30px; min-height: 500px; }
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
     .success-msg { background: #4caf50; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; }
+    .debug-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; direction: ltr; text-align: left; }
   </style>
 </head>
 <body>
@@ -48,6 +49,7 @@
 
     <div id="loading">جاري جلب الأسئلة من السيرفر...</div>
     <div id="error"></div>
+    <div id="debugInfo" class="debug-box" style="display:none;"></div>
     <div id="surveyContainer"></div>
   </div>
 
@@ -63,6 +65,12 @@
 
     if (examId) {
       document.getElementById('mainTitle').textContent = `اختبار: ${examId}`;
+    }
+
+    function showDebug(msg) {
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.style.display = 'block';
+      debugDiv.innerHTML += msg + '<br>';
     }
 
     // دالة لتنظيف البيانات
@@ -108,6 +116,7 @@
       try {
         const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
         
+        showDebug('جاري جلب البيانات...');
         const response = await fetch(fetchUrl);
         
         if (!response.ok) {
@@ -117,9 +126,11 @@
         const responseData = await response.json();
         let surveyData = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        console.log("البيانات قبل التصليح:", surveyData);
+        showDebug('البيانات المستلمة: ' + JSON.stringify(surveyData).substring(0, 100) + '...');
+        
         surveyData = fixSurveyData(surveyData);
-        console.log("البيانات بعد التصليح:", surveyData);
+        showDebug('عدد الصفحات: ' + (surveyData.pages ? surveyData.pages.length : 0));
+        showDebug('عدد الأسئلة: ' + (surveyData.pages && surveyData.pages[0] ? surveyData.pages[0].elements.length : 0));
 
         if (!surveyData || typeof surveyData !== 'object') {
           throw new Error("البيانات المستلمة غير صالحة");
@@ -130,13 +141,23 @@
         }
 
         document.getElementById('loading').style.display = 'none';
+        showDebug('جاري إنشاء نموذج SurveyJS...');
+
+        // التأكد من تحميل SurveyJS
+        if (typeof Survey === 'undefined') {
+          throw new Error("مكتبة SurveyJS لم يتم تحميلها");
+        }
 
         // إنشاء نموذج SurveyJS
         const survey = new Survey.Model(surveyData);
         survey.locale = "ar";
+        
+        showDebug('تم إنشاء النموذج، جاري العرض...');
 
-        // استخدام الطريقة الجديدة للعرض
-        survey.render(document.getElementById("surveyContainer"));
+        // عرض الاختبار
+        survey.render("surveyContainer");
+        
+        showDebug('تم عرض الاختبار!');
 
         // معالجة إكمال الاختبار
         survey.onComplete.add(async (sender) => {
@@ -156,7 +177,6 @@
               body: JSON.stringify(results)
             });
             
-            // إظهار رسالة نجاح
             document.getElementById('surveyContainer').innerHTML = 
               '<div class="success-msg">تم إرسال إجاباتك بنجاح! شكراً لك.</div>';
               
@@ -170,6 +190,7 @@
         document.getElementById('loading').style.display = 'none';
         document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
+        showDebug('خطأ: ' + err.message);
         console.error("Error Details:", err);
       }
     }
