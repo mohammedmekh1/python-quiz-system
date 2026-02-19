@@ -21,10 +21,11 @@
     input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
-    #surveyContainer { margin-top: 30px; }
+    #surveyContainer { margin-top: 30px; min-height: 400px; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #fafafa; }
     #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
     #error { color: #d32f2f; font-weight: bold; }
     #loading { color: #1e3a8a; }
+    .debug-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; direction: ltr; text-align: left; display: none; }
   </style>
 </head>
 <body>
@@ -45,6 +46,7 @@
 
     <div id="loading">جاري التحميل...</div>
     <div id="error"></div>
+    <div id="debugInfo" class="debug-box"></div>
     <div id="surveyContainer"></div>
   </div>
 
@@ -55,6 +57,13 @@
     const urlParams = new URLSearchParams(window.location.search);
     const examId = urlParams.get('exam');
     const token = urlParams.get('token');
+
+    function showDebug(msg) {
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.style.display = 'block';
+      debugDiv.innerHTML += msg + '<br>';
+      console.log(msg);
+    }
 
     async function startExam() {
       const name = document.getElementById('studentName').value.trim();
@@ -80,20 +89,16 @@
         if (!response.ok) throw new Error("فشل في جلب البيانات");
         
         const responseData = await response.json();
-        console.log("استجابة كاملة:", responseData);
-        
-        // n8n يرسل مصفوفة، نأخذ أول عنصر
         let surveyJson = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        // تنظيف البيانات - إزالة correctAnswer لأنه غير مدعوم
+        showDebug('البيانات المستلمة: ' + JSON.stringify(surveyJson).substring(0, 200));
+        
+        // تنظيف البيانات
         if (surveyJson.pages) {
           surveyJson.pages.forEach(page => {
             if (page.elements) {
               page.elements.forEach(q => {
-                if (q.correctAnswer) {
-                  delete q.correctAnswer; // إزالة الخاصية غير المدعومة
-                }
-                // إصلاح السؤال 3
+                if (q.correctAnswer) delete q.correctAnswer;
                 if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
                   q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
                 }
@@ -102,17 +107,48 @@
           });
         }
 
-        console.log("بعد التنظيف:", surveyJson);
+        showDebug('عدد الصفحات: ' + surveyJson.pages.length);
+        showDebug('عدد الأسئلة: ' + surveyJson.pages[0].elements.length);
         
         document.getElementById('loading').style.display = 'none';
 
-        // إنشاء وعرض الاختبار
+        // إنشاء النموذج
         const survey = new Survey.Model(surveyJson);
         survey.locale = "ar";
         
-        // طريقة عرض بديلة
-        document.getElementById('surveyContainer').innerHTML = '';
-        survey.render(document.getElementById('surveyContainer'));
+        showDebug('تم إنشاء النموذج');
+        
+        // تأخير قصير لضمان جاهزية DOM
+        setTimeout(() => {
+          const container = document.getElementById('surveyContainer');
+          
+          // التأكد من أن الحاوية مرئية وله حجم
+          container.style.display = 'block';
+          container.style.minHeight = '400px';
+          container.style.visibility = 'visible';
+          
+          // محاولة العرض
+          try {
+            survey.render(container);
+            showDebug('تم استدعاء render()');
+            
+            // التحقق بعد ثانية
+            setTimeout(() => {
+              const content = container.innerHTML;
+              showDebug('محتوى الحاوية: ' + content.substring(0, 100) + '...');
+              
+              if (content.length < 50) {
+                showDebug('تحذير: الحاوية فارغة!');
+                // محاولة ثانية باستخدام innerHTML
+                container.innerHTML = '<div id="surveyRoot"></div>';
+                survey.render(document.getElementById('surveyRoot'));
+              }
+            }, 1000);
+            
+          } catch (renderErr) {
+            showDebug('خطأ في render: ' + renderErr.message);
+          }
+        }, 100);
 
         // عند الإكمال
         survey.onComplete.add(async (sender) => {
@@ -141,6 +177,7 @@
         document.getElementById('loading').style.display = 'none';
         document.getElementById('error').textContent = "خطأ: " + err.message;
         document.getElementById('error').style.display = 'block';
+        showDebug('خطأ: ' + err.message);
         console.error(err);
       }
     }
