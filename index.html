@@ -7,10 +7,14 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- SurveyJS (تم التصحيح) -->
+  <!-- 1. مكتبة Knockout (ضرورية لعمل النسخة العادية من SurveyJS) -->
+  <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
+  
+  <!-- 2. مكتبة SurveyJS (نسخة Knockout) -->
   <link href="https://unpkg.com/survey-knockout@1.9.120/survey.css" rel="stylesheet" />
   <script src="https://unpkg.com/survey-knockout@1.9.120/survey.ko.min.js"></script>
-  <!-- ملف اللغة العربية -->
+  
+  <!-- 3. ملفات اللغة (اختياري لدعم العربية) -->
   <script src="https://unpkg.com/survey-knockout@1.9.120/survey.locales.min.js"></script>
 
   <style>
@@ -23,12 +27,15 @@
     button { width: 100%; background: #1e3a8a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
     button:hover { background: #2b4ec2; }
     #surveyContainer { margin-top: 30px; min-height: 500px; }
-    #loading, #error { text-align: center; font-size: 18px; margin: 30px 0; display: none; }
-    #error { color: #d32f2f; font-weight: bold; }
-    #loading { color: #1e3a8a; }
     
-    /* تنسيق RTL */
+    /* تنسيقات الحالة */
+    .status-box { text-align: center; font-size: 18px; margin: 30px 0; padding: 20px; border-radius: 8px; }
+    #loading { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    #error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    
+    /* دعم RTL لـ SurveyJS */
     .sd-root-modern { direction: rtl !important; text-align: right; }
+    .sd-body { direction: rtl !important; }
   </style>
 </head>
 <body>
@@ -47,8 +54,8 @@
       <button onclick="startExam()">ابدأ الاختبار الآن</button>
     </div>
 
-    <div id="loading">جاري التحميل...</div>
-    <div id="error"></div>
+    <div id="loading" class="status-box" style="display:none;">جاري التحميل...</div>
+    <div id="error" class="status-box" style="display:none;"></div>
     <div id="surveyContainer"></div>
   </div>
 
@@ -64,6 +71,7 @@
       const name = document.getElementById('studentName').value.trim();
       const email = document.getElementById('studentEmail').value.trim();
 
+      // تحقق بسيط من الإيميل
       if (!name || !email.includes('@')) {
         alert('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح');
         return;
@@ -76,6 +84,7 @@
 
       document.getElementById('studentForm').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
 
       try {
         const fetchUrl = `${GET_URL}?exam=${encodeURIComponent(examId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
@@ -86,12 +95,14 @@
         const responseData = await response.json();
         let surveyJson = Array.isArray(responseData) ? responseData[0] : responseData;
         
-        // تنظيف البيانات
+        // تنظيف البيانات الواردة
         if (surveyJson.pages) {
           surveyJson.pages.forEach(page => {
             if (page.elements) {
               page.elements.forEach(q => {
+                // إزالة الإجابات الصحيحة للأمان
                 if (q.correctAnswer) delete q.correctAnswer;
+                // إصلاح الخيارات الفارغة
                 if (q.choices && q.choices.length === 1 && q.choices[0] === 'Error') {
                   q.choices = ['خيار أ', 'خيار ب', 'خيار ج', 'خيار د'];
                 }
@@ -99,23 +110,24 @@
             }
           });
         }
-        
+
+        // تعطيل صفحة البداية إذا كانت مفعلة لمنع مشاكل العرض
         if (surveyJson.firstPageIsStarted) {
           surveyJson.firstPageIsStarted = false;
         }
         
         document.getElementById('loading').style.display = 'none';
 
-        // تهيئة النموذج
+        // إنشاء النموذج
         const survey = new Survey.Model(surveyJson);
-        survey.locale = "ar";
+        survey.locale = "ar"; // تعيين اللغة العربية
         survey.showNavigationButtons = true;
         survey.showProgressBar = "top";
         
-        // العرض
+        // عرض النموذج في الحاوية
         survey.render("surveyContainer");
 
-        // عند الإكمال
+        // عند الانتهاء من الاختبار
         survey.onComplete.add(async (sender) => {
           const results = {
             exam: examId,
@@ -127,15 +139,21 @@
           };
 
           try {
-            await fetch(POST_URL, {
+            const postResponse = await fetch(POST_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(results)
             });
-            document.getElementById("surveyContainer").innerHTML = "<div style='text-align:center; padding:40px; color:green; font-size:20px;'>تم إرسال الإجابات بنجاح!</div>";
+            
+            if(postResponse.ok) {
+              document.getElementById("surveyContainer").innerHTML = "<div class='status-box' style='background:#e8f5e9; color:#2e7d32;'>تم إرسال الإجابات بنجاح!</div>";
+            } else {
+              throw new Error("فشل الإرسال");
+            }
           } catch (e) {
-            console.error("خطأ في الإرسال:", e);
-            alert("حدث خطأ أثناء إرسال الإجابات.");
+            document.getElementById('error').textContent = "حدث خطأ أثناء إرسال الإجابات.";
+            document.getElementById('error').style.display = 'block';
+            console.error(e);
           }
         });
 
